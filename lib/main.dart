@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:texnokun/ui/pages/mainnavbar.dart';
+import 'package:texnokun/utils/app_styles/app_colors.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
 
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.mainColor),
         useMaterial3: false,
       ),
       home: MainNavBar(),

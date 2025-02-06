@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:texnokun/models/surahs.dart';
 import 'package:texnokun/ui/pages/favourites_page.dart';
 import 'package:texnokun/ui/pages/home_page.dart';
 import 'package:texnokun/ui/pages/quiz_page.dart';
@@ -20,7 +21,7 @@ class _MainNavBarState extends State<MainNavBar> {
   int _selectedIndex = 0;
 
   static   final List<Widget> _pages = [
-    const HomePage(),
+     HomePage(surahs: Surahs(),),
     QuizPage(),
     VocabularyPage(),
     FavouritesPage(),
