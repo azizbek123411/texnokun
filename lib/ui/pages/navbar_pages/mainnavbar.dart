@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:texnokun/models/surahs.dart';
-import 'package:texnokun/ui/pages/favourites_page.dart';
-import 'package:texnokun/ui/pages/home_page.dart';
-import 'package:texnokun/ui/pages/quiz_page.dart';
-import 'package:texnokun/ui/pages/settings_page.dart';
-import 'package:texnokun/ui/pages/vocabulary_page.dart';
+import 'package:texnokun/ui/pages/navbar_pages/favourites_page.dart';
+import 'package:texnokun/ui/pages/navbar_pages/home_page.dart';
+import 'package:texnokun/ui/pages/navbar_pages/quiz_page.dart';
+import 'package:texnokun/ui/pages/navbar_pages/settings_page.dart';
+import 'package:texnokun/ui/pages/navbar_pages/vocabulary_page.dart';
 import 'package:texnokun/ui/widgets/settings_drawer.dart';
 import 'package:texnokun/utils/app_styles/app_colors.dart';
 import 'package:texnokun/utils/text_styles/text_font_size.dart';
