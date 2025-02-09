@@ -5,7 +5,7 @@ import 'package:texnokun/utils/text_styles/text_styles.dart';
 import '../../models/surahs.dart';
 
 class SurahCard extends StatelessWidget {
-  final Surahs sura;
+  final SurahsModel sura;
   void Function() onTap;
    SurahCard({
     super.key,

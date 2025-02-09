@@ -1,4 +1,4 @@
-class Surahs {
+class SurahsModel {
   final String? surahName;
   final int? surahNumber;
   final String? englishAyahs;
@@ -6,7 +6,7 @@ class Surahs {
   final String? arabicAyahs;
   final String? russianAyahs;
 
-  Surahs({
+  SurahsModel({
     this.surahName,
     this.surahNumber,
     this.englishAyahs,
@@ -17,7 +17,7 @@ class Surahs {
 }
   List surahsData=[
 
-Surahs(
+SurahsModel(
     surahName: 'Al-Fatihah',
     surahNumber: 1,
     englishAyahs: 'In the Name of Allah—the Most Compassionate, Most Merciful.',
@@ -25,7 +25,7 @@ Surahs(
     russianAyahs: 'С именем Аллаха Милостивого, Милосердного!',
     ayahsCount: 7, 
   ),
-  Surahs(
+  SurahsModel(
     surahName: 'Al-Baqarah',
     surahNumber: 2,
     englishAyahs: 'Alif-Lãm-Mĩm.',

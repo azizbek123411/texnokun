@@ -8,7 +8,7 @@ import 'package:texnokun/utils/text_styles/text_styles.dart';
 import '../../utils/text_styles/text_font_size.dart';
 
 class SurahsDetailsPage extends StatefulWidget {
-  final Surahs surah;
+  final SurahsModel surah;
   const SurahsDetailsPage({super.key, required this.surah});
 
   @override
@@ -39,7 +39,12 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
           ),
         ),
       ),
-      body: SurahDetail(surah: widget.surah,)
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: SurahDetail(surah: widget.surah),
+        ),
+      ),
     );
   }
 }

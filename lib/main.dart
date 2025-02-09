@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:quran_flutter/quran.dart';
 import 'package:texnokun/ui/pages/navbar_pages/mainnavbar.dart';
 import 'package:texnokun/utils/app_styles/app_colors.dart';
 
-void main() {
+Future<void> main()async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Quran.initialize();
   runApp(const MyApp());
 }
 

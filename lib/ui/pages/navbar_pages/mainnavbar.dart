@@ -21,7 +21,7 @@ class _MainNavBarState extends State<MainNavBar> {
   int _selectedIndex = 0;
 
   static   final List<Widget> _pages = [
-     HomePage(surahs: Surahs(),),
+     HomePage(surahs: SurahsModel(),),
     QuizPage(),
     VocabularyPage(),
     FavouritesPage(),

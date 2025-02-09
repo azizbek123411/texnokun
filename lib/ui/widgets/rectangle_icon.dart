@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_iconly/flutter_iconly.dart';
 
 import '../../utils/app_styles/app_colors.dart';
 import '../../utils/sizes/app_padding.dart';
 
 class RectangleIcon extends StatelessWidget {
-  final IconData icon;
+  final Widget icon;
+  final double height;
+  final double width;
   void Function() onTap;
   RectangleIcon({
     super.key,
     required this.icon,
     required this.onTap,
+    required this.height, 
+    required this.width,
   });
 
   @override
@@ -18,13 +21,20 @@ class RectangleIcon extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        height: height,
+        width: width,
+
         padding: Dis.all(5),
         decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.grey, 
+            width: 1,
+          ),
           borderRadius: BorderRadius.circular(5),
           shape: BoxShape.rectangle,
           color: AppColors.whiteColor,
         ),
-        child: Icon(icon),
+        child: Center(child: icon),
       ),
     );
   }

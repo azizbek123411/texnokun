@@ -12,7 +12,7 @@ import 'package:texnokun/utils/text_styles/text_styles.dart';
 import '../surahs_details_page.dart';
 
 class HomePage extends StatefulWidget {
-  final Surahs surahs;
+  final SurahsModel surahs;
   const HomePage({
     super.key,
     required this.surahs,
@@ -29,8 +29,8 @@ class HomePageState extends State<HomePage> {
       backgroundColor: AppColors.backColor,
       body: Padding(
         padding: Dis.only(
-          lr: 20.w,
-          tb: 15.h,
+          lr: 15.w,
+          tb: 10.h,
         ),
         child: SingleChildScrollView(
           child: Column(
@@ -72,11 +72,21 @@ class HomePageState extends State<HomePage> {
                     SizedBox(
                       width: 30.w,
                     ),
-                   RectangleIcon(icon: IconlyLight.category, onTap: (){}),
+                    RectangleIcon(
+                      icon: const Icon(IconlyLight.category),
+                      onTap: () {},
+                      height: 35.h,
+                      width: 35.w,
+                    ),
                     SizedBox(
                       width: 8.w,
                     ),
-                    RectangleIcon(icon: Icons.menu, onTap: (){}),
+                    RectangleIcon(
+                      icon: const Icon(Icons.menu),
+                      onTap: () {},
+                      height: 35.h,
+                      width: 35.w,
+                    ),
                   ],
                 ),
               ),
