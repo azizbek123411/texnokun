@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quran_flutter/quran.dart';
 import 'package:texnokun/utils/app_styles/app_colors.dart';
 
 class QuizPage extends StatefulWidget {
@@ -7,16 +8,26 @@ class QuizPage extends StatefulWidget {
 }
 
 class _QuizPageState extends State<QuizPage> {
+   final List<String> surahNames = List.generate(
+    Quran.surahCount, 
+    (index) => Quran.getSurahName(index + 1), // Surah numbers start from 1
+  );
+
+  List surahs = Quran.getSurahAsList();
+  Map surahMap = Quran.getSurahAsMap();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backColor,
-      body: Center(
-        child: Text(
-          'Quiz Page',
-          style: TextStyle(fontSize: 24),
-        ),
+      body: ListView.builder(
+        itemCount: surahNames.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text("${index + 1}. ${surahNames[index]}"),
+          );
+        },
       ),
     );
+    
   }
 }

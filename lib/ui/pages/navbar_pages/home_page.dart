@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
-import 'package:texnokun/models/surahs.dart';
+import 'package:quran_flutter/quran.dart';
+import 'package:texnokun/models/ayah.dart';
 import 'package:texnokun/ui/widgets/rectangle_icon.dart';
 import 'package:texnokun/ui/widgets/surah_card.dart';
 import 'package:texnokun/utils/app_styles/app_colors.dart';
@@ -12,10 +13,10 @@ import 'package:texnokun/utils/text_styles/text_styles.dart';
 import '../surahs_details_page.dart';
 
 class HomePage extends StatefulWidget {
-  final SurahsModel surahs;
+ 
   const HomePage({
     super.key,
-    required this.surahs,
+   
   });
 
   @override
@@ -23,6 +24,12 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
+   final List<String> surahNames = List.generate(
+    Quran.surahCount, 
+    (index) => Quran.getSurahNameEnglish(index + 1,), // Surah numbers start from 1
+  );
+  
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,7 +104,7 @@ class HomePageState extends State<HomePage> {
                 height: 1000.h,
                 width: 800.w,
                 child: GridView.builder(
-                    itemCount: surahsData.length,
+                    itemCount: surahNames.length,
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                       childAspectRatio: 2.6,
@@ -107,13 +114,14 @@ class HomePageState extends State<HomePage> {
                     ),
                     itemBuilder: (context, index) {
                       return SurahCard(
-                        sura: surahsData[index],
+                        surahName: surahNames[index],
+                        surahNumber: index + 1,
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => SurahsDetailsPage(
-                                surah: surahsData[index],
+                                surahNumber: index+1,
                               ),
                             ),
                           );

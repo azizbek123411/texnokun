@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:texnokun/utils/text_styles/text_font_size.dart';
 import 'package:texnokun/utils/text_styles/text_styles.dart';
 
-import '../../models/surahs.dart';
+import '../../models/ayah.dart';
 
 class SurahCard extends StatelessWidget {
-  final SurahsModel sura;
+  final String surahName;
+  final int surahNumber;
   void Function() onTap;
    SurahCard({
     super.key,
-    required this.sura,required this.onTap
+    required this.surahName,
+    required this.onTap,
+    required this.surahNumber,
   });
 
   @override
@@ -31,10 +34,10 @@ class SurahCard extends StatelessWidget {
           ],
         ),
         child: ListTile(
-          title: Text(sura.surahName.toString(),style: AppTextStyle.instance.w900.copyWith(
+          title: Text(surahName.toString(),style: AppTextStyle.instance.w900.copyWith(
             fontSize: FontSizeConst.instance.largeFont,
           ),),
-          subtitle: Text('Surah ${sura.surahNumber.toString()}',style: AppTextStyle.instance.w300.copyWith(
+          subtitle: Text('Surah ${surahNumber.toString()}',style: AppTextStyle.instance.w300.copyWith(
             fontSize: FontSizeConst.instance.smallFont,
           ),),
         ),
