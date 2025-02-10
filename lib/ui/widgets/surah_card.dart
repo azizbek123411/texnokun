@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:texnokun/utils/text_styles/text_font_size.dart';
 import 'package:texnokun/utils/text_styles/text_styles.dart';
 
-import '../../models/ayah.dart';
+
 
 class SurahCard extends StatelessWidget {
   final String surahName;
@@ -17,10 +17,10 @@ class SurahCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+  
     return GestureDetector(
       onTap: onTap,
       child: Container(
-      
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),

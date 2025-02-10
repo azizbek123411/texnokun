@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:texnokun/utils/app_styles/app_colors.dart';
 import 'package:texnokun/utils/text_styles/text_font_size.dart';
 import 'package:texnokun/utils/text_styles/text_styles.dart';
+
+import '../../provider/font_size_provider.dart';
 
 class SettingsDrawer extends StatefulWidget {
   SettingsDrawer({super.key});
@@ -13,8 +15,6 @@ class SettingsDrawer extends StatefulWidget {
 }
 
 class _SettingsDrawerState extends State<SettingsDrawer> {
-  double _arabicFontSize = 16.0;
-  double _translateFontSize = 16.0;
   bool _showEnglishTranslation = true;
   bool _showRussianTranslation = false;
   bool _autoScrollToCurrentAyah = false;
@@ -60,71 +60,52 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
             ),
           ),
           ListTile(
-            title: Text('Arabic Font Size', style: AppTextStyle.instance.w600.copyWith(
-              fontSize: FontSizeConst.instance.smallFont,
-            )),
-            subtitle: Slider(
-              value: _arabicFontSize,
-              min: 10.0,
-              max: 30.0,
-              activeColor: AppColors.mainColor,
-              inactiveColor: AppColors.backColor,
-              onChanged: (double value) {
-                setState(() {
-                  _arabicFontSize = value;
-                });
+            title: Text('Arabic Font Size',
+                style: AppTextStyle.instance.w600.copyWith(
+                  fontSize: FontSizeConst.instance.smallFont,
+                )),
+            subtitle: Consumer<FontSizeProvider>(
+              builder: (context, fontSizeProvider, child) {
+                return Slider(
+                  value: fontSizeProvider.arabicFontSize,
+                  min: 10.0,
+                  max: 50.0,
+                  activeColor: AppColors.mainColor,
+                  inactiveColor: AppColors.backColor,
+                  onChanged: (value) {
+                    fontSizeProvider.setArabicFontSize(value);
+                  },
+                );
               },
             ),
           ),
           ListTile(
-            title: Text('Translate Font Size', style: AppTextStyle.instance.w600.copyWith(
-              fontSize: FontSizeConst.instance.smallFont,
-            )),
-            subtitle: Slider(
-              value: _translateFontSize,
-              min: 10.0,
-              max: 30.0,
-              activeColor: AppColors.mainColor,
-              inactiveColor: AppColors.backColor,
-              onChanged: (double value) {
-                setState(() {
-                  _translateFontSize = value;
-                });
+            title: Text('Translate Font Size',
+                style: AppTextStyle.instance.w600.copyWith(
+                  fontSize: FontSizeConst.instance.smallFont,
+                )),
+            subtitle: Consumer<FontSizeProvider>(
+              builder: (context, fontSizeProvider, child) {
+                return Slider(
+                  value: fontSizeProvider.translateFontSize,
+                  min: 10.0,
+                  max: 50.0,
+                  activeColor: AppColors.mainColor,
+                  inactiveColor: AppColors.backColor,
+                  onChanged: (value) {
+                    fontSizeProvider.setTranslateFontSize(value);
+                  },
+                );
               },
             ),
           ),
+          
           SwitchListTile(
-                        activeColor: AppColors.mainColor,
-
-            title: Text('Show English Translation', style: AppTextStyle.instance.w600.copyWith(
-              fontSize: FontSizeConst.instance.smallFont,
-            )),
-            value: _showEnglishTranslation,
-            onChanged: (bool value) {
-              setState(() {
-                _showEnglishTranslation = value;
-              });
-            },
-          ),
-          SwitchListTile(
-                        activeColor: AppColors.mainColor,
-
-            title: Text('Show Russian Translation', style: AppTextStyle.instance.w600.copyWith(
-              fontSize: FontSizeConst.instance.smallFont,
-            )),
-            value: _showRussianTranslation,
-            onChanged: (bool value) {
-              setState(() {
-                _showRussianTranslation = value;
-              });
-            },
-          ),
-          SwitchListTile(
-                        activeColor: AppColors.mainColor,
-
-            title: Text('Auto Scroll to Current Ayah', style: AppTextStyle.instance.w600.copyWith(
-              fontSize: FontSizeConst.instance.smallFont,
-            )),
+            activeColor: AppColors.mainColor,
+            title: Text('Auto Scroll to Current Ayah',
+                style: AppTextStyle.instance.w600.copyWith(
+                  fontSize: FontSizeConst.instance.smallFont,
+                )),
             value: _autoScrollToCurrentAyah,
             onChanged: (bool value) {
               setState(() {
@@ -134,9 +115,10 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
           ),
           SwitchListTile(
             activeColor: AppColors.mainColor,
-            title: Text('Show Ayah Counter', style: AppTextStyle.instance.w600.copyWith(
-              fontSize: FontSizeConst.instance.smallFont,
-            )),
+            title: Text('Show Ayah Counter',
+                style: AppTextStyle.instance.w600.copyWith(
+                  fontSize: FontSizeConst.instance.smallFont,
+                )),
             value: _showAyahCounter,
             onChanged: (bool value) {
               setState(() {

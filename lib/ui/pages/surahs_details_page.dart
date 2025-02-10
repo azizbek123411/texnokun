@@ -25,56 +25,57 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
     String surahName = Quran.getSurahNameEnglish(widget.surahNumber);
     int verseCount = Quran.getTotalVersesInSurah(widget.surahNumber);
     return Scaffold(
-        backgroundColor: AppColors.backColor,
-        appBar: AppBar(
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(
-              IconlyLight.arrowLeft2,
-              color: Colors.black,
-            ),
-          ),
-          backgroundColor: AppColors.whiteColor,
-          title: Text(
-            surahName.toString(),
-            style: AppTextStyle.instance.w900.copyWith(
-              color: AppColors.mainColor,
-              fontSize: FontSizeConst.instance.largeFont,
-            ),
+      backgroundColor: AppColors.backColor,
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            IconlyLight.arrowLeft2,
+            color: Colors.black,
           ),
         ),
-        body: Padding(
-          padding: Dis.only(
-            lr: 10.w,
-           top: 8.h,
+        backgroundColor: AppColors.whiteColor,
+        title: Text(
+          surahName.toString(),
+          style: AppTextStyle.instance.w900.copyWith(
+            color: AppColors.mainColor,
+            fontSize: FontSizeConst.instance.largeFont,
           ),
-          child: ListView.builder(
-              itemCount: verseCount,
-              itemBuilder: (context, index) {
-                Verse verseEnglish = Quran.getVerse(
-                  surahNumber: widget.surahNumber,
-                  verseNumber: index + 1,
-                  language: QuranLanguage.english,
-                );
-                Verse verse = Quran.getVerse(
-                  surahNumber: widget.surahNumber,
-                  verseNumber: index + 1,
-                  
-                );
-                Verse verseRussian = Quran.getVerse(
-                  surahNumber: widget.surahNumber,
-                  verseNumber: index + 1,
-                  language: QuranLanguage.russian,
-                );
-                return SurahDetail(
-                  verseCount: index + 1,
-                  russianAyahs: verseRussian.text,
-                  arabicAyahs: verse.text,
-                  englishAyahs: verseEnglish.text,
-                );
-              }),
-        ),);
+        ),
+      ),
+      body: Padding(
+        padding: Dis.only(
+          lr: 10.w,
+          top: 8.h,
+        ),
+        child: ListView.builder(
+            itemCount: verseCount,
+            itemBuilder: (context, index) {
+              Verse verseEnglish = Quran.getVerse(
+                surahNumber: widget.surahNumber,
+                verseNumber: index + 1,
+                language: QuranLanguage.english,
+              );
+              Verse verse = Quran.getVerse(
+                surahNumber: widget.surahNumber,
+                verseNumber: index + 1,
+              );
+              Verse verseRussian = Quran.getVerse(
+                surahNumber: widget.surahNumber,
+                verseNumber: index + 1,
+                language: QuranLanguage.russian,
+              );
+              return SurahDetail(
+                verseCount: index + 1,
+                russianAyahs: verseRussian.text,
+                arabicAyahs: verse.text,
+                englishAyahs: verseEnglish.text,
+                surahCount: widget.surahNumber,
+              );
+            }),
+      ),
+    );
   }
 }

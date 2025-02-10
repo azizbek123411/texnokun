@@ -1,12 +1,11 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import '../models/ayah.dart';
 
 class BookmarkProvider with ChangeNotifier {
   List<Ayah> _bookmarkedAyahs = [];
+  late Box box;
 
   List<Ayah> get bookmarkedAyahs => _bookmarkedAyahs;
 
@@ -21,39 +20,29 @@ class BookmarkProvider with ChangeNotifier {
   }
 
   void removeBookmark(Ayah ayah) {
-    _bookmarkedAyahs.remove(ayah);
+    _bookmarkedAyahs.removeWhere((item) => item.arabicText == ayah.arabicText);
     _saveBookmarks();
     notifyListeners();
   }
 
   bool isBookmarked(Ayah ayah) {
-    return _bookmarkedAyahs.contains(ayah);
+    return _bookmarkedAyahs.any((item) => item.arabicText == ayah.arabicText);
   }
 
   void _saveBookmarks() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> bookmarks = _bookmarkedAyahs
-        .map(
-          (ayah) => jsonEncode(
-            ayah.toJson(),
-          ),
-        )
+    box = await Hive.openBox('bookmarkBox');
+    List<Map<String, dynamic>> bookmarks = _bookmarkedAyahs
+        .map((ayah) => ayah.toJson())
         .toList();
-    prefs.setStringList('bookmarks', bookmarks);
+    box.put('bookmarks', bookmarks);
   }
 
   void _loadBookmarks() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String>? bookmarks = prefs.getStringList('bookmarks');
+    box = await Hive.openBox('bookmarkBox');
+    List<dynamic>? bookmarks = box.get('bookmarks');
     if (bookmarks != null) {
       _bookmarkedAyahs = bookmarks
-          .map(
-            (bookmark) => Ayah.fromJson(
-              jsonDecode(
-                bookmark,
-              ),
-            ),
-          )
+          .map((bookmark) => Ayah.fromJson(Map<String, dynamic>.from(bookmark)))
           .toList();
       notifyListeners();
     }

@@ -1,27 +1,30 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import 'package:texnokun/ui/widgets/rectangle_icon.dart';
 import 'package:texnokun/utils/app_styles/app_colors.dart';
 import 'package:texnokun/utils/sizes/app_padding.dart';
 import 'package:texnokun/utils/sizes/screen_utils.dart';
 import 'package:texnokun/utils/text_styles/text_font_size.dart';
 import 'package:texnokun/utils/text_styles/text_styles.dart';
-
 import '../../models/ayah.dart';
+import '../../provider/font_size_provider.dart';
 import '../../provider/provider.dart';
+import 'package:quran/quran.dart' as quran;
 
 class SurahDetail extends StatefulWidget {
-  final int verseCount;
+   int verseCount;
+  final int surahCount;
   final String arabicAyahs;
   final String russianAyahs;
   final String englishAyahs;
-  const SurahDetail({
+   SurahDetail({
     super.key,
     required this.arabicAyahs,
     required this.russianAyahs,
     required this.englishAyahs,
     required this.verseCount,
+    required this.surahCount,
   });
 
   @override
@@ -29,14 +32,92 @@ class SurahDetail extends StatefulWidget {
 }
 
 class _SurahDetailState extends State<SurahDetail> {
+bool isPlaying = false;
+
+  
+int repeatCount=1;
+int currentRepeat=0;
+Duration currentPosition=Duration.zero;
+  final player = AudioPlayer();
+
+  late Ayah ayah;
+
   @override
-  Widget build(BuildContext context) {
-    final ayah = Ayah(
+  void initState() {
+    super.initState();
+    ayah = Ayah(
       arabicText: widget.arabicAyahs,
       englishText: widget.englishAyahs,
       russianText: widget.russianAyahs,
     );
+     player.onPlayerComplete.listen((event) {
+      setState(() {
+        currentPosition = Duration.zero;
+        if (currentRepeat < repeatCount - 1) {
+          currentRepeat++;
+          _playCurrentAyah();
+        } else {
+          isPlaying = false;
+          currentRepeat = 0;
+          _playNextAyah();
+        }
+      });
+    });
+  
+  }
 
+  void _playCurrentAyah() async {
+    await player.play(
+      UrlSource(
+        quran.getAudioURLByVerse(
+          widget.surahCount,
+          widget.verseCount,
+        ),
+      ),
+    );
+    setState(() {
+      isPlaying = true;
+    });
+  }
+  @override
+  void dispose() {
+    player.dispose();
+    super.dispose();
+  }
+
+  void _playNextAyah() async {
+    if (widget.verseCount < quran.getVerseCount(widget.surahCount)) {
+      await player.play(
+        UrlSource(
+          quran.getAudioURLByVerse(
+            widget.surahCount,
+            widget.verseCount ++,
+          ),
+        ),
+      );
+      setState(() {
+        isPlaying = true;
+      });
+    }
+  }
+
+  void _togglePlayPause() async {
+    if (isPlaying) {
+      await player.pause();
+    } else {
+      _playCurrentAyah();
+    }
+    setState(() {
+      isPlaying = !isPlaying;
+    });
+  }
+
+
+
+
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       margin: Dis.only(
         bottom: 10.h,
@@ -63,39 +144,56 @@ class _SurahDetailState extends State<SurahDetail> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              RectangleIcon(
-                icon: Text('20x'),
-                onTap: () {},
+                 RectangleIcon(
+                icon: const Text('20x'),
+                onTap: () {
+                  setState(() {
+                    repeatCount = 20;
+                  });
+                  _playCurrentAyah();
+                },
                 height: 35.h,
                 width: 35.w,
               ),
               RectangleIcon(
-                icon: Text('15x'),
-                onTap: () {},
+                icon: const Text('15x'),
+                onTap: () {
+                  setState(() {
+                    repeatCount = 15;
+                  });
+                  _playCurrentAyah();
+                },
                 height: 35.h,
                 width: 35.w,
               ),
               RectangleIcon(
-                icon: Text('10x'),
-                onTap: () {},
+                icon: const Text('10x'),
+                onTap: () {
+                  setState(() {
+                    repeatCount = 10;
+                  });
+                  _playCurrentAyah();
+                },
                 height: 35.h,
                 width: 35.w,
               ),
               RectangleIcon(
-                icon: Text('5x'),
-                onTap: () {},
+                icon: const Text('5x'),
+                onTap: () {
+                  setState(() {
+                    repeatCount = 5;
+                  });
+                  _playCurrentAyah();
+                },
                 height: 35.h,
                 width: 35.w,
               ),
               RectangleIcon(
-                icon: Icon(Icons.play_arrow_outlined),
-                onTap: () {},
-                height: 35.h,
-                width: 35.w,
-              ),
-              RectangleIcon(
-                icon: Icon(Icons.games_outlined),
-                onTap: () {},
+                icon:Icon(isPlaying?Icons.pause: Icons.play_arrow_outlined),
+                onTap: (){
+                  _togglePlayPause();
+                
+                },
                 height: 35.h,
                 width: 35.w,
               ),
@@ -107,7 +205,9 @@ class _SurahDetailState extends State<SurahDetail> {
                       isBookmarked
                           ? Icons.bookmark
                           : Icons.bookmark_border_outlined,
-                      color: isBookmarked ? Colors.red : Colors.black,
+                      color: isBookmarked
+                          ? AppColors.mainColor
+                          : AppColors.appColor,
                     ),
                     onTap: () {
                       if (isBookmarked) {
@@ -137,11 +237,15 @@ class _SurahDetailState extends State<SurahDetail> {
                 ),
               ),
               Flexible(
-                child: Text(
-                  widget.arabicAyahs.toString(),
-                  style: AppTextStyle.instance.w700.copyWith(
-                    fontSize: FontSizeConst.instance.extraLargeFont,
-                  ),
+                child: Consumer<FontSizeProvider>(
+                  builder: (context, fontSizeProvider, child) {
+                    return Text(
+                      widget.arabicAyahs.toString(),
+                      style: AppTextStyle.instance.w700.copyWith(
+                        fontSize: fontSizeProvider.arabicFontSize,
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
@@ -149,20 +253,28 @@ class _SurahDetailState extends State<SurahDetail> {
           SizedBox(
             height: 15.h,
           ),
-          Text(
-            widget.englishAyahs.toString(),
-            style: AppTextStyle.instance.w300.copyWith(
-              fontSize: FontSizeConst.instance.extraSmallFont,
-            ),
+          Consumer<FontSizeProvider>(
+            builder: (context, fontSizeProvider, child) {
+              return Text(
+                widget.englishAyahs.toString(),
+                style: AppTextStyle.instance.w300.copyWith(
+                  fontSize: fontSizeProvider.translateFontSize,
+                ),
+              );
+            },
           ),
           SizedBox(
             height: 8.h,
           ),
-          Text(
-            widget.russianAyahs.toString(),
-            style: AppTextStyle.instance.w300.copyWith(
-              fontSize: FontSizeConst.instance.extraSmallFont,
-            ),
+          Consumer<FontSizeProvider>(
+            builder: (context, fontSizeProvider, child) {
+              return Text(
+                widget.russianAyahs.toString(),
+                style: AppTextStyle.instance.w300.copyWith(
+                  fontSize: fontSizeProvider.translateFontSize,
+                ),
+              );
+            },
           ),
         ],
       ),

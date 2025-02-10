@@ -8,6 +8,7 @@ import 'package:texnokun/ui/widgets/settings_drawer.dart';
 import 'package:texnokun/utils/app_styles/app_colors.dart';
 import 'package:texnokun/utils/text_styles/text_font_size.dart';
 import 'package:texnokun/utils/text_styles/text_styles.dart';
+import 'package:quran_flutter/quran.dart';
 
 class MainNavBar extends StatefulWidget {
   @override
