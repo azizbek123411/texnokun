@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:texnokun/models/ayah.dart';
-import 'package:texnokun/provider/provider.dart';
+
 import 'package:texnokun/ui/widgets/rectangle_icon.dart';
 import 'package:texnokun/utils/app_styles/app_colors.dart';
 import 'package:texnokun/utils/sizes/app_padding.dart';
@@ -9,6 +8,8 @@ import 'package:texnokun/utils/sizes/screen_utils.dart';
 import 'package:texnokun/utils/text_styles/text_font_size.dart';
 import 'package:texnokun/utils/text_styles/text_styles.dart';
 
+import '../../models/ayah.dart';
+import '../../provider/provider.dart';
 
 class SurahDetail extends StatefulWidget {
   final int verseCount;

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
-import 'package:texnokun/models/ayah.dart';
 import 'package:texnokun/ui/pages/navbar_pages/favourites_page.dart';
 import 'package:texnokun/ui/pages/navbar_pages/home_page.dart';
-import 'package:texnokun/ui/pages/navbar_pages/quiz_page.dart';
 import 'package:texnokun/ui/pages/navbar_pages/settings_page.dart';
 import 'package:texnokun/ui/pages/navbar_pages/vocabulary_page.dart';
 import 'package:texnokun/ui/widgets/settings_drawer.dart';
@@ -20,16 +18,15 @@ class _MainNavBarState extends State<MainNavBar> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _selectedIndex = 0;
 
-  static   final List<Widget> _pages = [
-     HomePage(),
-    QuizPage(),
+  static final List<Widget> _pages = [
+    const HomePage(),
     VocabularyPage(),
     FavouritesPage(),
     SettingsPage(),
   ];
 
   void _onItemTapped(int index) {
-    if (index == 4) {
+    if (index == 3) {
       _scaffoldKey.currentState?.openEndDrawer();
     } else {
       setState(() {
@@ -60,10 +57,6 @@ class _MainNavBarState extends State<MainNavBar> {
           BottomNavigationBarItem(
             icon: Icon(IconlyLight.home),
             label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(IconlyLight.infoSquare),
-            label: 'Quiz',
           ),
           BottomNavigationBarItem(
             icon: Icon(IconlyLight.tickSquare),
