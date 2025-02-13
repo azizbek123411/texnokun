@@ -11,14 +11,15 @@ import '../../models/ayah.dart';
 import '../../provider/font_size_provider.dart';
 import '../../provider/provider.dart';
 import 'package:quran/quran.dart' as quran;
+import '../../service/audio_service.dart';
 
 class SurahDetail extends StatefulWidget {
-   int verseCount;
+  int verseCount;
   final int surahCount;
   final String arabicAyahs;
   final String russianAyahs;
   final String englishAyahs;
-   SurahDetail({
+  SurahDetail({
     super.key,
     required this.arabicAyahs,
     required this.russianAyahs,
@@ -32,14 +33,13 @@ class SurahDetail extends StatefulWidget {
 }
 
 class _SurahDetailState extends State<SurahDetail> {
-bool isPlaying = false;
-
-  
-int repeatCount=1;
-int currentRepeat=0;
-Duration currentPosition=Duration.zero;
+  bool isPlaying = false;
+  int repeatCount = 1;
+  int currentRepeat = 0;
+  Duration currentPosition = Duration.zero;
+  Duration totalDuration = Duration.zero;
   final player = AudioPlayer();
-
+  final audioService = AudioServices();
   late Ayah ayah;
 
   @override
@@ -50,7 +50,20 @@ Duration currentPosition=Duration.zero;
       englishText: widget.englishAyahs,
       russianText: widget.russianAyahs,
     );
-     player.onPlayerComplete.listen((event) {
+
+    player.onPositionChanged.listen((position) {
+      setState(() {
+        currentPosition = position;
+      });
+    });
+
+    player.onDurationChanged.listen((duration) {
+      setState(() {
+        totalDuration = duration;
+      });
+    });
+
+    player.onPlayerComplete.listen((event) {
       setState(() {
         currentPosition = Duration.zero;
         if (currentRepeat < repeatCount - 1) {
@@ -63,47 +76,39 @@ Duration currentPosition=Duration.zero;
         }
       });
     });
-  
   }
 
-  void _playCurrentAyah() async {
-    await player.play(
-      UrlSource(
-        quran.getAudioURLByVerse(
-          widget.surahCount,
-          widget.verseCount,
-        ),
-      ),
-    );
-    setState(() {
-      isPlaying = true;
-    });
-  }
   @override
   void dispose() {
     player.dispose();
     super.dispose();
   }
 
-  void _playNextAyah() async {
-    if (widget.verseCount < quran.getVerseCount(widget.surahCount)) {
-      await player.play(
-        UrlSource(
-          quran.getAudioURLByVerse(
-            widget.surahCount,
-            widget.verseCount ++,
-          ),
-        ),
-      );
+  void _playCurrentAyah() async {
+    var path = await audioService.downloadAudio(
+      widget.surahCount,
+      widget.verseCount,
+    );
+    if (path.isNotEmpty) {
+      await player.play(DeviceFileSource(path));
       setState(() {
         isPlaying = true;
       });
     }
   }
 
+  void _playNextAyah() async {
+    if (widget.verseCount < quran.getVerseCount(widget.surahCount)) {
+      setState(() {
+        widget.verseCount++;
+      });
+      _playCurrentAyah();
+    }
+  }
+
   void _togglePlayPause() async {
     if (isPlaying) {
-      await player.pause();
+      await player.stop();
     } else {
       _playCurrentAyah();
     }
@@ -111,10 +116,6 @@ Duration currentPosition=Duration.zero;
       isPlaying = !isPlaying;
     });
   }
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -144,7 +145,7 @@ Duration currentPosition=Duration.zero;
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-                 RectangleIcon(
+              RectangleIcon(
                 icon: const Text('20x'),
                 onTap: () {
                   setState(() {
@@ -154,7 +155,7 @@ Duration currentPosition=Duration.zero;
                 },
                 height: 35.h,
                 width: 35.w,
-              ),
+                              ),
               RectangleIcon(
                 icon: const Text('15x'),
                 onTap: () {
@@ -165,7 +166,7 @@ Duration currentPosition=Duration.zero;
                 },
                 height: 35.h,
                 width: 35.w,
-              ),
+                              ),
               RectangleIcon(
                 icon: const Text('10x'),
                 onTap: () {
@@ -176,7 +177,7 @@ Duration currentPosition=Duration.zero;
                 },
                 height: 35.h,
                 width: 35.w,
-              ),
+                              ),
               RectangleIcon(
                 icon: const Text('5x'),
                 onTap: () {
@@ -187,13 +188,10 @@ Duration currentPosition=Duration.zero;
                 },
                 height: 35.h,
                 width: 35.w,
-              ),
+                              ),
               RectangleIcon(
-                icon:Icon(isPlaying?Icons.pause: Icons.play_arrow_outlined),
-                onTap: (){
-                  _togglePlayPause();
-                
-                },
+                icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow_outlined),
+                onTap: _togglePlayPause,
                 height: 35.h,
                 width: 35.w,
               ),
