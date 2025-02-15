@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:texnokun/ui/pages/navbar_pages/favourites_page.dart';
 import 'package:texnokun/ui/pages/navbar_pages/home_page.dart';
+import 'package:texnokun/ui/pages/navbar_pages/quiz_page.dart';
 import 'package:texnokun/ui/pages/navbar_pages/settings_page.dart';
 import 'package:texnokun/ui/pages/navbar_pages/vocabulary_page.dart';
 import 'package:texnokun/ui/widgets/settings_drawer.dart';
 import 'package:texnokun/utils/app_styles/app_colors.dart';
 import 'package:texnokun/utils/text_styles/text_font_size.dart';
 import 'package:texnokun/utils/text_styles/text_styles.dart';
-import 'package:quran_flutter/quran.dart';
 
 class MainNavBar extends StatefulWidget {
   @override
@@ -21,13 +21,14 @@ class _MainNavBarState extends State<MainNavBar> {
 
   static final List<Widget> _pages = [
     const HomePage(),
+    QuizPage(),
     VocabularyPage(),
     FavouritesPage(),
     SettingsPage(),
   ];
 
   void _onItemTapped(int index) {
-    if (index == 3) {
+    if (index == 4) {
       _scaffoldKey.currentState?.openEndDrawer();
     } else {
       setState(() {
@@ -58,6 +59,10 @@ class _MainNavBarState extends State<MainNavBar> {
           BottomNavigationBarItem(
             icon: Icon(IconlyLight.home),
             label: 'Home',
+          ),
+            BottomNavigationBarItem(
+            icon: Icon(IconlyLight.tickSquare),
+            label: 'Quiz',
           ),
           BottomNavigationBarItem(
             icon: Icon(IconlyLight.tickSquare),

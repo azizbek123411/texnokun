@@ -4,6 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:quran_flutter/quran.dart';
 import 'package:texnokun/provider/font_size_provider.dart';
 import 'package:texnokun/provider/provider.dart';
+import 'package:texnokun/provider/quiz_provider.dart';
 import 'package:texnokun/ui/pages/navbar_pages/mainnavbar.dart';
 import 'package:texnokun/utils/app_styles/app_colors.dart';
 
@@ -25,6 +26,8 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => BookmarkProvider()),
         ChangeNotifierProvider(create: (_) => FontSizeProvider()),
+        ChangeNotifierProvider(create: (_) => QuizProvider()),
+      
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
