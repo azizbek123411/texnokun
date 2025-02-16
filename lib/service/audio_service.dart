@@ -14,9 +14,6 @@ class AudioServices {
 
   Future<bool> _requestPermission() async {
     var status = await Permission.storage.status;
-
-
-  
       if (await Permission.manageExternalStorage.isDenied) {
     await Permission.manageExternalStorage.request();
   }
@@ -24,8 +21,9 @@ class AudioServices {
       status = await Permission.storage.request();
       log(status.toString());
       log(status.hashCode.toString());
+      
     }
-    return status.isGranted;
+    return true;
   }
 
   Future<String> downloadAudio(surahId, verceId) async {
@@ -38,7 +36,7 @@ class AudioServices {
     String fileName = "$surahId$verceId.mp3";
 
     if (await _requestPermission()) {
-      Directory? dir = await getDownloadsDirectory();
+      Directory? dir = await getApplicationDocumentsDirectory();
       String savePath = "${dir!.path}/$fileName";
 
       try {

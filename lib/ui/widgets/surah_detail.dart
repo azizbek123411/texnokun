@@ -12,6 +12,7 @@ import '../../provider/font_size_provider.dart';
 import '../../provider/provider.dart';
 import 'package:quran/quran.dart' as quran;
 import '../../service/audio_service.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class SurahDetail extends StatefulWidget {
   int verseCount;
@@ -41,10 +42,12 @@ class _SurahDetailState extends State<SurahDetail> {
   final player = AudioPlayer();
   final audioService = AudioServices();
   late Ayah ayah;
+  final fToast = FToast();
 
   @override
   void initState() {
     super.initState();
+    fToast.init(context);
     ayah = Ayah(
       arabicText: widget.arabicAyahs,
       englishText: widget.englishAyahs,
@@ -84,6 +87,28 @@ class _SurahDetailState extends State<SurahDetail> {
     super.dispose();
   }
 
+  void showToast() {
+    if (isPlaying) {
+      fToast.showToast(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(25.0),
+            color: Colors.black54,
+          ),
+          child: Text(
+            "Playing",
+            style: AppTextStyle.instance.w300.copyWith(
+              color: AppColors.whiteColor,
+            ),
+          ),
+        ),
+        gravity: ToastGravity.BOTTOM,
+        toastDuration: const Duration(seconds: 4),
+      );
+    }
+  }
+
   void _playCurrentAyah() async {
     var path = await audioService.downloadAudio(
       widget.surahCount,
@@ -94,6 +119,7 @@ class _SurahDetailState extends State<SurahDetail> {
       setState(() {
         isPlaying = true;
       });
+      // showToast();
     }
   }
 
@@ -115,6 +141,7 @@ class _SurahDetailState extends State<SurahDetail> {
     setState(() {
       isPlaying = !isPlaying;
     });
+    showToast();
   }
 
   @override
@@ -148,14 +175,16 @@ class _SurahDetailState extends State<SurahDetail> {
               RectangleIcon(
                 icon: const Text('20x'),
                 onTap: () {
+                  showToast();
                   setState(() {
                     repeatCount = 20;
                   });
                   _playCurrentAyah();
+                  
                 },
                 height: 35.h,
                 width: 35.w,
-                              ),
+              ),
               RectangleIcon(
                 icon: const Text('15x'),
                 onTap: () {
@@ -166,7 +195,7 @@ class _SurahDetailState extends State<SurahDetail> {
                 },
                 height: 35.h,
                 width: 35.w,
-                              ),
+              ),
               RectangleIcon(
                 icon: const Text('10x'),
                 onTap: () {
@@ -177,7 +206,7 @@ class _SurahDetailState extends State<SurahDetail> {
                 },
                 height: 35.h,
                 width: 35.w,
-                              ),
+              ),
               RectangleIcon(
                 icon: const Text('5x'),
                 onTap: () {
@@ -188,7 +217,7 @@ class _SurahDetailState extends State<SurahDetail> {
                 },
                 height: 35.h,
                 width: 35.w,
-                              ),
+              ),
               RectangleIcon(
                 icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow_outlined),
                 onTap: _togglePlayPause,

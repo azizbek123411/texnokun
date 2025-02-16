@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:texnokun/service/audio_service.dart';
 import 'package:texnokun/ui/pages/navbar_pages/favourites_page.dart';
 import 'package:texnokun/ui/pages/navbar_pages/home_page.dart';
 import 'package:texnokun/ui/pages/navbar_pages/quiz_page.dart';
@@ -36,7 +37,15 @@ class _MainNavBarState extends State<MainNavBar> {
       });
     }
   }
+  @override
+  void initState() {
+    super.initState();
+    initPermiPermission();
+  }
 
+  void initPermiPermission()async{
+    await AudioServices().initPermission();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

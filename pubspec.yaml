@@ -45,6 +45,7 @@ dependencies:
   dio: ^5.8.0+1
   path_provider: ^2.1.5
   permission_handler: ^11.3.1
+  fluttertoast: ^8.2.12
 
 dev_dependencies:
   flutter_test:
