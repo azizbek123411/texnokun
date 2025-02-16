@@ -16,7 +16,7 @@ class QuizScreen extends StatelessWidget {
     return Consumer<QuizProvider>(
       builder: (context, quizProvider, child) {
         if (quizProvider.questions.isEmpty) {
-          return Scaffold(body: Center(child: Text("Loading questions...")));
+          return const Scaffold(body: Center(child: Text("Loading questions...")));
         }
 
         final currentQuestion =
@@ -27,7 +27,7 @@ class QuizScreen extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(
             leading: IconButton(
-              icon: Icon(
+              icon: const Icon(
                 Icons.arrow_back,
                 color: AppColors.mainColor,
               ),
@@ -36,9 +36,9 @@ class QuizScreen extends StatelessWidget {
               },
             ),
             backgroundColor: Colors.white,
-            title: Text(
+            title: const Text(
               "Quiz",
-              style: TextStyle(
+              style:  TextStyle(
                 color: AppColors.mainColor,
               ),
             ),
@@ -53,7 +53,7 @@ class QuizScreen extends StatelessWidget {
                   style: AppTextStyle.instance.w700.copyWith(fontSize: FontSizeConst.instance.extraLargeFont,),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ...options.map((option) => Padding(
                   padding: Dis.only(tb: 5.h),
                   child: Container(
@@ -68,9 +68,10 @@ class QuizScreen extends StatelessWidget {
                         if (quizProvider.currentIndex >=
                             quizProvider.questions.length - 1) {
                         showDialog(context: context, builder: (context){
-                          return ResultDialog();
+                          return const ResultDialog();
                         });
                         }
+                        Navigator.pop(context);
                       }, 
                       title: Text(option), 
                     ),

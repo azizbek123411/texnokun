@@ -173,6 +173,9 @@ class _SurahDetailState extends State<SurahDetail> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               RectangleIcon(
+                color: repeatCount == 20
+                    ? AppColors.mainColor
+                    : AppColors.backColor,
                 icon: const Text('20x'),
                 onTap: () {
                   showToast();
@@ -180,7 +183,6 @@ class _SurahDetailState extends State<SurahDetail> {
                     repeatCount = 20;
                   });
                   _playCurrentAyah();
-                  
                 },
                 height: 35.h,
                 width: 35.w,
@@ -195,8 +197,14 @@ class _SurahDetailState extends State<SurahDetail> {
                 },
                 height: 35.h,
                 width: 35.w,
+                color: repeatCount == 15
+                    ? AppColors.mainColor
+                    : AppColors.backColor,
               ),
               RectangleIcon(
+                color: repeatCount == 10
+                    ? AppColors.mainColor
+                    : AppColors.backColor,
                 icon: const Text('10x'),
                 onTap: () {
                   setState(() {
@@ -208,6 +216,9 @@ class _SurahDetailState extends State<SurahDetail> {
                 width: 35.w,
               ),
               RectangleIcon(
+                color: repeatCount == 5
+                    ? AppColors.mainColor
+                    : AppColors.backColor,
                 icon: const Text('5x'),
                 onTap: () {
                   setState(() {
@@ -219,6 +230,7 @@ class _SurahDetailState extends State<SurahDetail> {
                 width: 35.w,
               ),
               RectangleIcon(
+                
                 icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow_outlined),
                 onTap: _togglePlayPause,
                 height: 35.h,

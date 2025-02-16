@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:texnokun/utils/app_styles/app_colors.dart';
+import 'package:texnokun/utils/sizes/app_padding.dart';
+import 'package:texnokun/utils/sizes/screen_utils.dart';
+import 'package:texnokun/utils/text_styles/text_styles.dart';
+
+import '../../../utils/text_styles/text_font_size.dart';
 
 class VocabularyPage extends StatefulWidget {
   @override
@@ -88,18 +93,36 @@ class _VocabularyPageState extends State<VocabularyPage> {
     return Scaffold(
       backgroundColor: AppColors.backColor,
       
-      body: ListView.builder(
+      body: words.isNotEmpty? ListView.builder(
         itemCount: words.length,
         itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(words[index]['word']!),
-            subtitle: Text(words[index]['meaning']!),
+          return Container(
+            margin: Dis.only(top: 8.h,lr: 10.w),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.backColor),
+            ),
+            child: ListTile(
+              title: Text(words[index]['word']!,style: AppTextStyle.instance.w700.copyWith(
+                fontSize: FontSizeConst.instance.largeFont,
+              ),),
+              subtitle: Text(words[index]['meaning']!,style: AppTextStyle.instance.w400.copyWith(
+                fontSize: FontSizeConst.instance.mediumFont,),
+            ),
+          ),
           );
         },
+      ):Center(
+        child: Text('No words added yet!',style: AppTextStyle.instance.w600.copyWith(
+          fontSize: 20,
+          color: AppColors.appColor  
+        ),),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.mainColor,
         onPressed: _showAddWordDialog,
-        child: Icon(Icons.add),
+        child: Icon(Icons.add, color: Colors.white),
       ),
     );
   }

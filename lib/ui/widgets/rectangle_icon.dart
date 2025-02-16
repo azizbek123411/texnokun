@@ -7,6 +7,7 @@ class RectangleIcon extends StatelessWidget {
   final Widget icon;
   final double height;
   final double width;
+  final Color? color;
   void Function() onTap;
   RectangleIcon({
     super.key,
@@ -14,6 +15,7 @@ class RectangleIcon extends StatelessWidget {
     required this.onTap,
     required this.height, 
     required this.width,
+    this.color,
   });
 
   @override
@@ -32,7 +34,7 @@ class RectangleIcon extends StatelessWidget {
           ),
           borderRadius: BorderRadius.circular(5),
           shape: BoxShape.rectangle,
-          color: AppColors.whiteColor,
+         color: color ?? AppColors.whiteColor,
         ),
         child: Center(child: icon),
       ),
