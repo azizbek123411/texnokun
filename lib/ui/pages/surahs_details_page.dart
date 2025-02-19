@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:quran/surah_data.dart';
 import 'package:quran_flutter/enums/quran_language.dart';
 import 'package:quran_flutter/models/verse.dart';
 import 'package:quran_flutter/quran.dart';
+import 'package:scroll_to_id/scroll_to_id.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:texnokun/ui/widgets/surah_detail.dart';
 import 'package:texnokun/utils/app_styles/app_colors.dart';
 import 'package:texnokun/utils/sizes/app_padding.dart';
@@ -20,10 +23,23 @@ class SurahsDetailsPage extends StatefulWidget {
 }
 
 class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
+
+
+
+late ScrollToId scrollToId;
+  final ScrollController scrollController = ScrollController();
+
+@override
+  void initState() {
+
+    super.initState();
+       scrollToId = ScrollToId(scrollController: scrollController);
+  }
+
   @override
   Widget build(BuildContext context) {
     String surahName = Quran.getSurahNameEnglish(widget.surahNumber);
-    int verseCount = Quran.getTotalVersesInSurah(widget.surahNumber);
+    
     return Scaffold(
       backgroundColor: AppColors.backColor,
       appBar: AppBar(
@@ -50,32 +66,32 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
           lr: 10.w,
           top: 8.h,
         ),
-        child: ListView.builder(
-            itemCount: verseCount,
-            itemBuilder: (context, index) {
-              Verse verseEnglish = Quran.getVerse(
-                surahNumber: widget.surahNumber,
-                verseNumber: index + 1,
-                language: QuranLanguage.english,
-              );
-              Verse verse = Quran.getVerse(
-                surahNumber: widget.surahNumber,
-                verseNumber: index + 1,
-              );
-              Verse verseRussian = Quran.getVerse(
-                surahNumber: widget.surahNumber,
-                verseNumber: index + 1,
-                language: QuranLanguage.russian,
-              );
-              return SurahDetail(
-                verseCount: index + 1,
-                russianAyahs: verseRussian.text,
-                arabicAyahs: verse.text,
-                englishAyahs: verseEnglish.text,
-                surahCount: widget.surahNumber,
-              );
-            }),
-      ),
+        child: InteractiveScrollViewer(
+          scrollToId: scrollToId,
+        children: [
+         for(final item in Quran.getSurahVersesAsList(widget.surahNumber))
+          ScrollContent(id:'${item.surahNumber }  ${item.verseNumber}', child: surahDetail(item,(){
+            scrollToId.jumpToNext();
+          }),)
+        ],)
+      )
+     
     );
   }
+
+
+Widget surahDetail(Verse verse,void Function() nextVerse){  
+final itemEnglishVerse=Quran.getVerse(surahNumber:verse.surahNumber,verseNumber:verse.verseNumber,language: QuranLanguage.english);
+final itemRussianVerse=Quran.getVerse(surahNumber:verse.surahNumber,verseNumber:verse.verseNumber,language: QuranLanguage.russian);
+final itemArabicVerse=Quran.getVerse(surahNumber:verse.surahNumber,verseNumber:verse.verseNumber,);
+
+  return SurahDetail(
+                arabicAyahs: itemArabicVerse.text,
+                englishAyahs: itemEnglishVerse.text,
+                russianAyahs: itemRussianVerse.text,
+                verseCount: verse.verseNumber,
+                surahCount: widget.surahNumber, nextVerse: nextVerse,
+              );
+}
+
 }

@@ -1,6 +1,8 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:quran_flutter/models/verse.dart';
+import 'package:quran_flutter/quran_flutter.dart';
 import 'package:texnokun/ui/widgets/rectangle_icon.dart';
 import 'package:texnokun/utils/app_styles/app_colors.dart';
 import 'package:texnokun/utils/sizes/app_padding.dart';
@@ -15,6 +17,7 @@ import '../../service/audio_service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class SurahDetail extends StatefulWidget {
+  void Function() nextVerse;
   int verseCount;
   final int surahCount;
   final String arabicAyahs;
@@ -27,6 +30,7 @@ class SurahDetail extends StatefulWidget {
     required this.englishAyahs,
     required this.verseCount,
     required this.surahCount,
+    required this.nextVerse,
   });
 
   @override
@@ -43,10 +47,17 @@ class _SurahDetailState extends State<SurahDetail> {
   final audioService = AudioServices();
   late Ayah ayah;
   final fToast = FToast();
+  late Verse inititalVerse;
 
   @override
   void initState() {
     super.initState();
+   setState(() {
+      inititalVerse = Quran.getVerse(
+      surahNumber: widget.surahCount,
+      verseNumber: widget.verseCount,
+    );
+   });
     fToast.init(context);
     ayah = Ayah(
       arabicText: widget.arabicAyahs,
@@ -67,6 +78,7 @@ class _SurahDetailState extends State<SurahDetail> {
     });
 
     player.onPlayerComplete.listen((event) {
+      widget.nextVerse();
       setState(() {
         currentPosition = Duration.zero;
         if (currentRepeat < repeatCount - 1) {
@@ -76,6 +88,7 @@ class _SurahDetailState extends State<SurahDetail> {
           isPlaying = false;
           currentRepeat = 0;
           _playNextAyah();
+     
         }
       });
     });
@@ -127,6 +140,10 @@ class _SurahDetailState extends State<SurahDetail> {
     if (widget.verseCount < quran.getVerseCount(widget.surahCount)) {
       setState(() {
         widget.verseCount++;
+              inititalVerse = Quran.getVerse(
+      surahNumber: widget.surahCount,
+      verseNumber: widget.verseCount,
+    );
       });
       _playCurrentAyah();
     }
@@ -230,7 +247,6 @@ class _SurahDetailState extends State<SurahDetail> {
                 width: 35.w,
               ),
               RectangleIcon(
-                
                 icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow_outlined),
                 onTap: _togglePlayPause,
                 height: 35.h,
