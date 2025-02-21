@@ -17,8 +17,13 @@ class AyahModel {
 }
 
 class QuranService {
-  List<SurahModel> getAllSurahs() {
-    return List.generate(114, (index) {
+  List<SurahModel>? _cachedSurahs;
+   List<SurahModel> getAllSurahs() {
+    if (_cachedSurahs != null) {
+      return _cachedSurahs!;
+    }
+
+    _cachedSurahs = List.generate(114, (index) {
       int surahNumber = index + 1;
       List<AyahModel> ayahs = List.generate(quran.getVerseCount(surahNumber), (i) {
         return AyahModel(
@@ -33,7 +38,10 @@ class QuranService {
         ayahs: ayahs,
       );
     });
+
+    return _cachedSurahs!;
   }
+
 
   List<AyahModel> getRandomAyahs(int surahNumber, int count) {
     List<AyahModel> ayahs = getAllSurahs()

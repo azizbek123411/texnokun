@@ -69,9 +69,12 @@ class QuizScreen extends StatelessWidget {
                             quizProvider.questions.length - 1) {
                         showDialog(context: context, builder: (context){
                           return const ResultDialog();
+
+                        }).then((event){
+                          Navigator.pop(context);
                         });
                         }
-                        Navigator.pop(context);
+                        
                       }, 
                       title: Text(option), 
                     ),

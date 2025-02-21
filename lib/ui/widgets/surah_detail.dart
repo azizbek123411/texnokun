@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,160 +14,65 @@ import 'package:texnokun/utils/text_styles/text_styles.dart';
 import '../../models/ayah.dart';
 import '../../provider/font_size_provider.dart';
 import '../../provider/provider.dart';
-import 'package:quran/quran.dart' as quran;
-import '../../service/audio_service.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class SurahDetail extends StatefulWidget {
-  void Function() nextVerse;
-  int verseCount;
+  final void Function() togglePlayPause;
+  final void Function() play20;
+  final void Function() play15;
+  final void Function() play10;
+  final void Function() play5;
+  final bool isPlaying;
+  final int repeatCount;
+  final int verseCount;
   final int surahCount;
   final String arabicAyahs;
   final String russianAyahs;
   final String englishAyahs;
-  SurahDetail({
-    super.key,
-    required this.arabicAyahs,
-    required this.russianAyahs,
-    required this.englishAyahs,
-    required this.verseCount,
-    required this.surahCount,
-    required this.nextVerse,
-  });
+  final Verse verse;
+  const SurahDetail(
+      {super.key,
+      required this.play10,
+      required this.play5,
+      required this.play20,
+      required this.play15,
+      required this.arabicAyahs,
+      required this.russianAyahs,
+      required this.englishAyahs,
+      required this.verseCount,
+      required this.surahCount,
+      required this.isPlaying,
+      required this.repeatCount,
+      required this.togglePlayPause,
+      required this.verse});
 
   @override
   State<SurahDetail> createState() => _SurahDetailState();
 }
 
 class _SurahDetailState extends State<SurahDetail> {
-  bool isPlaying = false;
-  int repeatCount = 1;
-  int currentRepeat = 0;
-  Duration currentPosition = Duration.zero;
-  Duration totalDuration = Duration.zero;
-  final player = AudioPlayer();
-  final audioService = AudioServices();
-  late Ayah ayah;
-  final fToast = FToast();
-  late Verse inititalVerse;
-
-  @override
-  void initState() {
-    super.initState();
-   setState(() {
-      inititalVerse = Quran.getVerse(
-      surahNumber: widget.surahCount,
-      verseNumber: widget.verseCount,
-    );
-   });
-    fToast.init(context);
-    ayah = Ayah(
-      arabicText: widget.arabicAyahs,
-      englishText: widget.englishAyahs,
-      russianText: widget.russianAyahs,
-    );
-
-    player.onPositionChanged.listen((position) {
-      setState(() {
-        currentPosition = position;
-      });
-    });
-
-    player.onDurationChanged.listen((duration) {
-      setState(() {
-        totalDuration = duration;
-      });
-    });
-
-    player.onPlayerComplete.listen((event) {
-      widget.nextVerse();
-      setState(() {
-        currentPosition = Duration.zero;
-        if (currentRepeat < repeatCount - 1) {
-          currentRepeat++;
-          _playCurrentAyah();
-        } else {
-          isPlaying = false;
-          currentRepeat = 0;
-          _playNextAyah();
-     
-        }
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    player.dispose();
-    super.dispose();
-  }
-
-  void showToast() {
-    if (isPlaying) {
-      fToast.showToast(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(25.0),
-            color: Colors.black54,
-          ),
-          child: Text(
-            "Playing",
-            style: AppTextStyle.instance.w300.copyWith(
-              color: AppColors.whiteColor,
-            ),
-          ),
-        ),
-        gravity: ToastGravity.BOTTOM,
-        toastDuration: const Duration(seconds: 4),
-      );
-    }
-  }
-
-  void _playCurrentAyah() async {
-    var path = await audioService.downloadAudio(
-      widget.surahCount,
-      widget.verseCount,
-    );
-    if (path.isNotEmpty) {
-      await player.play(DeviceFileSource(path));
-      setState(() {
-        isPlaying = true;
-      });
-      // showToast();
-    }
-  }
-
-  void _playNextAyah() async {
-    if (widget.verseCount < quran.getVerseCount(widget.surahCount)) {
-      setState(() {
-        widget.verseCount++;
-              inititalVerse = Quran.getVerse(
-      surahNumber: widget.surahCount,
-      verseNumber: widget.verseCount,
-    );
-      });
-      _playCurrentAyah();
-    }
-  }
-
-  void _togglePlayPause() async {
-    if (isPlaying) {
-      await player.stop();
-    } else {
-      _playCurrentAyah();
-    }
-    setState(() {
-      isPlaying = !isPlaying;
-    });
-    showToast();
-  }
-
   @override
   Widget build(BuildContext context) {
+    final versee = Ayah(
+      arabicText: Quran.getVerse(
+        surahNumber: widget.verse.surahNumber,
+        verseNumber: widget.verse.verseNumber,
+      ).text,
+      englishText: Quran.getVerse(
+              surahNumber: widget.verse.surahNumber,
+              verseNumber: widget.verse.verseNumber,
+              language: QuranLanguage.english)
+          .text,
+      russianText: Quran.getVerse(
+              surahNumber: widget.verse.surahNumber,
+              verseNumber: widget.verse.verseNumber,
+              language: QuranLanguage.russian)
+          .text,
+    );
     return Container(
       margin: Dis.only(
         bottom: 10.h,
+        top: 8,
+        lr: 16,
       ),
       padding: Dis.only(
         lr: 10.w,
@@ -190,71 +97,51 @@ class _SurahDetailState extends State<SurahDetail> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               RectangleIcon(
-                color: repeatCount == 20
+                color: widget.repeatCount == 20
                     ? AppColors.mainColor
                     : AppColors.backColor,
                 icon: const Text('20x'),
-                onTap: () {
-                  showToast();
-                  setState(() {
-                    repeatCount = 20;
-                  });
-                  _playCurrentAyah();
-                },
+                onTap: widget.play20,
                 height: 35.h,
                 width: 35.w,
               ),
               RectangleIcon(
                 icon: const Text('15x'),
-                onTap: () {
-                  setState(() {
-                    repeatCount = 15;
-                  });
-                  _playCurrentAyah();
-                },
+                onTap: widget.play15,
                 height: 35.h,
                 width: 35.w,
-                color: repeatCount == 15
+                color: widget.repeatCount == 15
                     ? AppColors.mainColor
                     : AppColors.backColor,
               ),
               RectangleIcon(
-                color: repeatCount == 10
+                color: widget.repeatCount == 10
                     ? AppColors.mainColor
                     : AppColors.backColor,
                 icon: const Text('10x'),
-                onTap: () {
-                  setState(() {
-                    repeatCount = 10;
-                  });
-                  _playCurrentAyah();
-                },
+                onTap: widget.play10,
                 height: 35.h,
                 width: 35.w,
               ),
               RectangleIcon(
-                color: repeatCount == 5
+                color: widget.repeatCount == 5
                     ? AppColors.mainColor
                     : AppColors.backColor,
                 icon: const Text('5x'),
-                onTap: () {
-                  setState(() {
-                    repeatCount = 5;
-                  });
-                  _playCurrentAyah();
-                },
+                onTap: widget.play5,
                 height: 35.h,
                 width: 35.w,
               ),
               RectangleIcon(
-                icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow_outlined),
-                onTap: _togglePlayPause,
+                icon: Icon(
+                    widget.isPlaying ? Icons.pause : Icons.play_arrow_outlined),
+                onTap: widget.togglePlayPause,
                 height: 35.h,
                 width: 35.w,
               ),
               Consumer<BookmarkProvider>(
                 builder: (context, bookmarkProvider, child) {
-                  final isBookmarked = bookmarkProvider.isBookmarked(ayah);
+                  final isBookmarked = bookmarkProvider.isBookmarked(versee);
                   return RectangleIcon(
                     icon: Icon(
                       isBookmarked
@@ -266,9 +153,9 @@ class _SurahDetailState extends State<SurahDetail> {
                     ),
                     onTap: () {
                       if (isBookmarked) {
-                        bookmarkProvider.removeBookmark(ayah);
+                        bookmarkProvider.removeBookmark(versee);
                       } else {
-                        bookmarkProvider.addBookmark(ayah);
+                        bookmarkProvider.addBookmark(versee);
                       }
                     },
                     height: 35.h,
