@@ -10,7 +10,6 @@ import 'package:texnokun/utils/text_styles/text_font_size.dart';
 import 'package:texnokun/utils/text_styles/text_styles.dart';
 
 import '../surahs_details_page.dart';
-import 'package:quran/quran.dart' as quran;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

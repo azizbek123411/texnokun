@@ -28,10 +28,11 @@ class _MainNavBarState extends State<MainNavBar> {
     SettingsPage(),
   ];
 
-  void _onItemTapped(int index) {
+  void _onItemTapped(int index)async {
     if (index == 4) {
       _scaffoldKey.currentState?.openEndDrawer();
-    } else {
+    } 
+  else {
       setState(() {
         _selectedIndex = index;
       });
@@ -74,7 +75,7 @@ class _MainNavBarState extends State<MainNavBar> {
             label: 'Quiz',
           ),
           BottomNavigationBarItem(
-            icon: Icon(IconlyLight.tickSquare),
+            icon: Icon(IconlyLight.paper),
             label: 'Vocabulary',
           ),
           BottomNavigationBarItem(
