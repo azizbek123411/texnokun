@@ -13,7 +13,7 @@ class QuizProvider with ChangeNotifier {
   int get score => _score;
 
   void startQuiz(int surahNumber) {
-    _questions =  _quranService.getRandomAyahs(surahNumber, 5);
+    _questions =  _quranService.getRandomAyahs(surahNumber, 6);
     _currentIndex = 0;
     _score = 0;
     notifyListeners();

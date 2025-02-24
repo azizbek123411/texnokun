@@ -1,9 +1,6 @@
-import 'dart:developer';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:quran_flutter/models/verse.dart';
 import 'package:quran_flutter/quran_flutter.dart';
 import 'package:texnokun/ui/widgets/rectangle_icon.dart';
 import 'package:texnokun/utils/app_styles/app_colors.dart';

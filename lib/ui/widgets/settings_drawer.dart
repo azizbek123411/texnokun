@@ -15,8 +15,7 @@ class SettingsDrawer extends StatefulWidget {
 }
 
 class _SettingsDrawerState extends State<SettingsDrawer> {
-  bool _showEnglishTranslation = true;
-  bool _showRussianTranslation = false;
+  
   bool _autoScrollToCurrentAyah = false;
   bool _showAyahCounter = true;
 

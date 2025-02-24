@@ -1,6 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:quran_flutter/enums/quran_language.dart';
 import 'package:quran_flutter/models/surah.dart';
 import 'package:quran_flutter/models/verse.dart';
@@ -8,8 +9,7 @@ import 'package:quran_flutter/quran.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:texnokun/ui/widgets/surah_detail.dart';
 import 'package:texnokun/utils/app_styles/app_colors.dart';
-import 'package:texnokun/utils/sizes/app_padding.dart';
-import 'package:texnokun/utils/sizes/screen_utils.dart';
+
 import 'package:texnokun/utils/text_styles/text_styles.dart';
 
 import '../../service/audio_service.dart';
@@ -43,6 +43,8 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
   Surah get surah => Quran.getSurah(widget.surahNumber);
   final ScrollController scrollController = ScrollController();
 
+  final fToast=FToast();
+
   void _onPressedPlayButton(Verse verse) async {
     setState(() {});
     if (_isPlaying) {
@@ -58,6 +60,7 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
         .then((_) => setState(() => _isPlaying = true));
 
     print(((verse == _initialVerse) && _isPlaying));
+    
   }
 
   void _audioPlayerListener() {
@@ -104,7 +107,39 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
     });
 
     _audioPlayerListener();
+    fToast.init(context);
   }
+  _showToast(String toastText) {
+    Widget toast = Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+        decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25.0),
+        color: const Color.fromARGB(255, 116, 157, 245),
+        ),
+        child:  Row(
+        mainAxisSize: MainAxisSize.min,
+        children:  [
+            const Icon(Icons.check,color: AppColors.whiteColor,),
+            const SizedBox(
+            width: 12.0,
+            ),
+            Text(toastText,style: AppTextStyle.instance.w400.copyWith(
+              fontSize: FontSizeConst.instance.smallFont,color: AppColors.whiteColor
+          
+            ),),
+        ],
+        ),
+    );
+
+
+    fToast.showToast(
+        child: toast,
+        gravity: ToastGravity.BOTTOM,
+        toastDuration: const Duration(seconds: 4),
+    );
+
+ 
+}
 
   @override
   Widget build(BuildContext context) {
@@ -149,6 +184,11 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
             surahNumber: widget.surahNumber,
             onPressedPlayButton: () {
               _onPressedPlayButton(item);
+              if(!_isPlaying){
+                _showToast('Playing..');
+              }else{
+                null;
+              }
             },
             play10: () {
               setState(() {

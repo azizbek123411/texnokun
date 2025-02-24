@@ -45,43 +45,45 @@ class QuizScreen extends StatelessWidget {
           ),
           body: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  currentQuestion.arabic,
-                  style: AppTextStyle.instance.w700.copyWith(fontSize: FontSizeConst.instance.extraLargeFont,),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 20),
-                ...options.map((option) => Padding(
-                  padding: Dis.only(tb: 5.h),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.backColor,
-                      border: Border.all(color: AppColors.backColor),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: ListTile(
-                      onTap: () {
-                        quizProvider.answerQuestion(option);
-                        if (quizProvider.currentIndex >=
-                            quizProvider.questions.length - 1) {
-                        showDialog(context: context, builder: (context){
-                          return const ResultDialog();
-
-                        }).then((event){
-                          Navigator.pop(context);
-                        });
-                        }
-                        
-                      }, 
-                      title: Text(option), 
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    currentQuestion.arabic,
+                    style: AppTextStyle.instance.w700.copyWith(fontSize: FontSizeConst.instance.extraLargeFont,),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+                  ...options.map((option) => Padding(
+                    padding: Dis.only(tb: 5.h),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.backColor,
+                        border: Border.all(color: AppColors.backColor),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: ListTile(
+                        onTap: () {
+                          quizProvider.answerQuestion(option);
+                          if (quizProvider.currentIndex >=
+                              quizProvider.questions.length - 1) {
+                          showDialog(context: context, builder: (context){
+                            return const ResultDialog();
+              
+                          }).then((event){
+                            Navigator.pop(context);
+                          });
+                          }
+                          
+                        }, 
+                        title: Text(option), 
+                      ),
                     ),
                   ),
-                ),
-                )
-              ],
+                  )
+                ],
+              ),
             ),
           ),
         );

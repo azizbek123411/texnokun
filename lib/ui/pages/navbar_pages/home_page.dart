@@ -79,10 +79,11 @@ class HomePageState extends State<HomePage> {
                 SizedBox(
                   height: 40.h,
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       SizedBox(
                         height: 40.h,
-                        width: 250.w,
+                        width: MediaQuery.of(context).size.width*0.5,
                         child: TextField(
                           controller: searchController,
                           decoration: InputDecoration(
@@ -101,9 +102,9 @@ class HomePageState extends State<HomePage> {
                           onChanged: filterSurahs,
                         ),
                       ),
-                      SizedBox(
-                        width: 30.w,
-                      ),
+                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children:[
                       RectangleIcon(
                         icon: Icon(
                           IconlyLight.category,
@@ -113,9 +114,9 @@ class HomePageState extends State<HomePage> {
                         height: 35.h,
                         width: 35.w,
                       ),
-                      SizedBox(
-                        width: 8.w,
-                      ),
+                  SizedBox(
+                    width:MediaQuery.of(context).size.width*0.06
+                  ),
                       RectangleIcon(
                         icon: Icon(
                           Icons.menu,
@@ -125,6 +126,8 @@ class HomePageState extends State<HomePage> {
                         height: 35.h,
                         width: 35.w,
                       ),
+                      ]
+                     )
                     ],
                   ),
                 ),

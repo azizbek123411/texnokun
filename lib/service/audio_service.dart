@@ -37,7 +37,7 @@ class AudioServices {
 
     if (await _requestPermission()) {
       Directory? dir = await getApplicationDocumentsDirectory();
-      String savePath = "${dir!.path}/$fileName";
+      String savePath = "${dir.path}/$fileName";
 
       try {
         final url = getAudioURLByVerse(surahId, verceId);

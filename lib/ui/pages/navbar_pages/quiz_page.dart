@@ -119,7 +119,7 @@ class _QuizPageState extends State<QuizPage> {
                       ),
                     );
 
-                    await Future.delayed(const Duration(milliseconds: 500));
+                    await Future.delayed(const Duration(milliseconds: 300));
 
                     Provider.of<QuizProvider>(context, listen: false)
                         .startQuiz(index+1);
