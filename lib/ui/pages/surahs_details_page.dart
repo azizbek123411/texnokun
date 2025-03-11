@@ -39,28 +39,92 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
   int _currentRepeat = 0;
   final _player = AudioPlayer();
   final _audioService = AudioServices();
+  Duration duration = Duration.zero;
+  Duration position = Duration.zero;
 
   Surah get surah => Quran.getSurah(widget.surahNumber);
   final ScrollController scrollController = ScrollController();
 
-  final fToast=FToast();
+  final fToast = FToast();
 
   void _onPressedPlayButton(Verse verse) async {
+    showBottom();
     setState(() {});
     if (_isPlaying) {
       await _player.stop().then((_) => setState(() => _isPlaying = false));
+
       return;
     }
 
     _initialVerse = verse;
     final audioPath = await _audioService.downloadAudio(
         widget.surahNumber, verse.verseNumber);
+
     await _player
         .play(DeviceFileSource(audioPath))
         .then((_) => setState(() => _isPlaying = true));
-
     print(((verse == _initialVerse) && _isPlaying));
-    
+  }
+
+  void showBottom() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20), color: Colors.white),
+        height: 100,
+        child: Center(
+          child: Column(
+            children: [
+              Slider(
+                  activeColor: AppColors.mainColor,
+                  min: 0,
+                  max: duration.inSeconds.toDouble(),
+                  value: position.inSeconds.toDouble(),
+                  onChanged: (value) async {}),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(
+                      Icons.skip_previous,
+                      size: 30,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      if (_isPlaying) {
+                        _player.pause();
+                        setState(() {
+                          _isPlaying = false;
+                        });
+                      } else {
+                        _player.resume();
+                        setState(() {
+                          _isPlaying = true;
+                        });
+                      }
+                    },
+                    icon: Icon(
+                      _isPlaying ? Icons.play_arrow : Icons.pause,
+                      size: 30,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {},
+                    icon: Icon(
+                      Icons.skip_next,
+                      size: 30,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void _audioPlayerListener() {
@@ -108,38 +172,57 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
 
     _audioPlayerListener();
     fToast.init(context);
+
+    _player.onPlayerStateChanged.listen((state) {
+      setState(() {
+        _isPlaying = state == PlayerState.playing;
+      });
+    });
+    _player.onDurationChanged.listen((newDuration) {
+      setState(() {
+        duration = newDuration;
+      });
+    });
+    _player.onPositionChanged.listen((newPosition) {
+      setState(() {
+        position = newPosition;
+      });
+    });
   }
+
   _showToast(String toastText) {
     Widget toast = Container(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-        decoration: BoxDecoration(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+      decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(25.0),
         color: const Color.fromARGB(255, 116, 157, 245),
-        ),
-        child:  Row(
+      ),
+      child: Row(
         mainAxisSize: MainAxisSize.min,
-        children:  [
-            const Icon(Icons.check,color: AppColors.whiteColor,),
-            const SizedBox(
+        children: [
+          const Icon(
+            Icons.check,
+            color: AppColors.whiteColor,
+          ),
+          const SizedBox(
             width: 12.0,
-            ),
-            Text(toastText,style: AppTextStyle.instance.w400.copyWith(
-              fontSize: FontSizeConst.instance.smallFont,color: AppColors.whiteColor
-          
-            ),),
+          ),
+          Text(
+            toastText,
+            style: AppTextStyle.instance.w400.copyWith(
+                fontSize: FontSizeConst.instance.smallFont,
+                color: AppColors.whiteColor),
+          ),
         ],
-        ),
+      ),
     );
-
 
     fToast.showToast(
-        child: toast,
-        gravity: ToastGravity.BOTTOM,
-        toastDuration: const Duration(seconds: 4),
+      child: toast,
+      gravity: ToastGravity.BOTTOM,
+      toastDuration: const Duration(seconds: 4),
     );
-
- 
-}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -184,9 +267,9 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
             surahNumber: widget.surahNumber,
             onPressedPlayButton: () {
               _onPressedPlayButton(item);
-              if(!_isPlaying){
+              if (!_isPlaying) {
                 _showToast('Playing..');
-              }else{
+              } else {
                 null;
               }
             },
