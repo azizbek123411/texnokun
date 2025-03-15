@@ -29,11 +29,11 @@ class SurahsDetailsPage extends StatefulWidget {
 class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
   final ScrollOffsetController scrollOffsetController =
       ScrollOffsetController();
- 
   final ScrollOffsetListener scrollOffsetListener =
       ScrollOffsetListener.create();
-        final ItemScrollController _scrollController = ItemScrollController();
-  final ItemPositionsListener _positionsListener = ItemPositionsListener.create();
+  final ItemScrollController _scrollController = ItemScrollController();
+  final ItemPositionsListener _positionsListener =
+      ItemPositionsListener.create();
   bool _isFabVisible = false;
 
   late Verse _initialVerse;
@@ -45,12 +45,21 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
 
-
-
   Surah get surah => Quran.getSurah(widget.surahNumber);
   final ScrollController scrollController = ScrollController();
 
   final fToast = FToast();
+  int _initialIndex=0;
+
+  void chooseVerse(int index) {
+    _scrollController.scrollTo(
+      index: index,
+      duration: Duration(
+        milliseconds: 300,
+      ),
+      curve: Curves.bounceIn
+    );
+  }
 
   void _onPressedPlayButton(Verse verse) async {
     setState(() {});
@@ -109,11 +118,9 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
   void initState() {
     super.initState();
 
-
- _positionsListener.itemPositions.addListener(() {
+    _positionsListener.itemPositions.addListener(() {
       final positions = _positionsListener.itemPositions.value;
-      
-      // Agar foydalanuvchi pastga tushgan bo'lsa, FAB ko‘rinadi
+
       if (positions.isNotEmpty && positions.first.index > 2) {
         if (!_isFabVisible) {
           setState(() {
@@ -128,7 +135,6 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
         }
       }
     });
-
 
     setState(() {
       _initialVerse =
@@ -153,7 +159,6 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
         position = newPosition;
       });
     });
-
   }
 
   _showToast(String toastText) {
@@ -190,10 +195,6 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
     );
   }
 
-
-
-
-
   @override
   Widget build(BuildContext context) {
     String surahName = Quran.getSurahNameEnglish(widget.surahNumber);
@@ -228,7 +229,7 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
         scrollOffsetListener: scrollOffsetListener,
         itemBuilder: (context, index) {
           final item = list[index];
-      
+
           return SurahDetailItemScreen(
             verse: item,
             initialVerse: _initialVerse,
@@ -275,31 +276,37 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: _isFabVisible? Container(
-        padding: Dis.only(tb: 8, lr: 5),
-        decoration: BoxDecoration(
-            color: AppColors.backColor,
-            borderRadius: BorderRadius.circular(10)),
-        height: MediaQuery.of(context).size.height*0.09,
-        width: MediaQuery.of(context).size.width*0.7,
-        child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: list.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding:Dis.only(lr: 3),
-                child: RectangleIcon(
-                  icon: Text('${index + 1}'),
-                  onTap: () {
-                    print(list.length);
-                  },
-                  height: 40,
-                  width: 50,
-                  color: AppColors.mainColor,
-                ),
-              );
-            }),
-      ):null,
+      floatingActionButton: _isFabVisible
+          ? Container(
+              padding: Dis.only(tb: 8, lr: 5),
+              decoration: BoxDecoration(
+                  color: AppColors.backColor,
+                  borderRadius: BorderRadius.circular(10)),
+              height: MediaQuery.of(context).size.height * 0.09,
+              width: MediaQuery.of(context).size.width * 0.7,
+              child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: list.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: Dis.only(lr: 3),
+                      child: RectangleIcon(
+                        icon: Text('${index + 1}'),
+                        onTap: () {
+                          chooseVerse(index);
+                          setState(() {
+                            _initialIndex=index;
+                          });
+                          print(_initialIndex);
+                        },
+                        height: 40,
+                        width: 50,
+                        color: _initialIndex==index?AppColors.mainColor:AppColors.whiteColor,
+                      ),
+                    );
+                  }),
+            )
+          : null,
     );
   }
 }
