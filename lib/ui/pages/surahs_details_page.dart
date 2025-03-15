@@ -46,7 +46,6 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
   Duration position = Duration.zero;
 
   Surah get surah => Quran.getSurah(widget.surahNumber);
-  final ScrollController scrollController = ScrollController();
 
   final fToast = FToast();
   int _initialIndex=0;
@@ -193,6 +192,11 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
       gravity: ToastGravity.BOTTOM,
       toastDuration: const Duration(seconds: 4),
     );
+  }
+  @override
+  void dispose() {
+   _positionsListener;
+    super.dispose();
   }
 
   @override

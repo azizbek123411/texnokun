@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:texnokun/provider/arabic_font_provider.dart';
 import 'package:texnokun/utils/app_styles/app_colors.dart';
 import 'package:texnokun/utils/text_styles/text_font_size.dart';
 import 'package:texnokun/utils/text_styles/text_styles.dart';
@@ -15,12 +17,13 @@ class SettingsDrawer extends StatefulWidget {
 }
 
 class _SettingsDrawerState extends State<SettingsDrawer> {
-  
   bool _autoScrollToCurrentAyah = false;
   bool _showAyahCounter = true;
 
   @override
   Widget build(BuildContext context) {
+    final changeFont = Provider.of<ArabicFontProvider>(context);
+
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -98,7 +101,6 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
               },
             ),
           ),
-          
           SwitchListTile(
             activeColor: AppColors.mainColor,
             title: Text('Auto Scroll to Current Ayah',
@@ -125,6 +127,57 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
               });
             },
           ),
+          Text(
+            'Arabic Font Styles',
+            textAlign: TextAlign.center,
+            style: AppTextStyle.instance.w600.copyWith(
+              fontSize: FontSizeConst.instance.mediumFont,
+            ),
+          ),
+          CheckboxListTile(
+              title: Text(
+                'Amiri font',
+                style: GoogleFonts.amiri(),
+              ),
+              value: changeFont.selectedFont == 'Amiri',
+              onChanged: (bool? selected) {
+                if (selected == true) {
+                  changeFont.changeFont('Amiri');
+                }
+              }),
+          CheckboxListTile(
+              title: Text(
+                'Scheherazade font',
+                style: GoogleFonts.scheherazadeNew(),
+              ),
+              value: changeFont.selectedFont == 'Scheherazade',
+              onChanged: (bool? selected) {
+                if (selected == true) {
+                  changeFont.changeFont('Scheherazade');
+                }
+              }),
+          CheckboxListTile(
+             title: Text(
+                'Lateef font',
+                style: GoogleFonts.lateef(),
+              ),
+              value: changeFont.selectedFont == 'Lateef',
+              onChanged: (bool? selected) {
+                if (selected == true) {
+                  changeFont.changeFont('Lateef');
+                }
+              }),
+          CheckboxListTile(
+             title: Text(
+                'Qahiri font',
+                style: GoogleFonts.qahiri(),
+              ),
+              value: changeFont.selectedFont == 'Qahiri',
+              onChanged: (bool? selected) {
+                if (selected == true) {
+                  changeFont.changeFont('Qahiri');
+                }
+              })
         ],
       ),
     );

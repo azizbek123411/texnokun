@@ -47,6 +47,7 @@ dependencies:
   permission_handler: ^11.3.1
   fluttertoast: ^8.2.12
   scrollable_positioned_list: ^0.3.8
+  google_fonts: ^6.2.1
   
   
 

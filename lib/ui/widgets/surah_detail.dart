@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quran_flutter/quran_flutter.dart';
+import 'package:texnokun/provider/arabic_font_provider.dart';
 import 'package:texnokun/ui/widgets/rectangle_icon.dart';
 import 'package:texnokun/utils/app_styles/app_colors.dart';
 import 'package:texnokun/utils/sizes/app_padding.dart';
@@ -49,6 +50,10 @@ class SurahDetail extends StatefulWidget {
 class _SurahDetailState extends State<SurahDetail> {
   @override
   Widget build(BuildContext context) {
+
+final fontProvider=Provider.of<ArabicFontProvider>(context);
+
+
     final versee = Ayah(
       arabicText: Quran.getVerse(
         surahNumber: widget.verse.surahNumber,
@@ -180,9 +185,7 @@ class _SurahDetailState extends State<SurahDetail> {
                   builder: (context, fontSizeProvider, child) {
                     return Text(
                       widget.arabicAyahs.toString(),
-                      style: AppTextStyle.instance.w700.copyWith(
-                        fontSize: fontSizeProvider.arabicFontSize,
-                      ),
+                      style: fontProvider.arabicFont.copyWith(fontSize: 30)
                     );
                   },
                 ),
