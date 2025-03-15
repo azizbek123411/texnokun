@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
-import 'package:quran_flutter/quran.dart';
+import 'package:quran/quran.dart' as quran;
 import 'package:texnokun/ui/widgets/rectangle_icon.dart';
 import 'package:texnokun/ui/widgets/surah_card.dart';
 import 'package:texnokun/utils/app_styles/app_colors.dart';
@@ -11,6 +11,7 @@ import 'package:texnokun/utils/text_styles/text_styles.dart';
 
 import '../surahs_details_page.dart';
 
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -20,8 +21,8 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   final List<String> surahNames = List.generate(
-    Quran.surahCount,
-    (index) => Quran.getSurahNameEnglish(index + 1), // Surah numbers start from 1
+    114,
+    (index) => quran.getSurahName(index + 1), // Surah numbers start from 1
   );
 
   List<String> filteredSurahNames = [];
@@ -32,6 +33,7 @@ class HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     filteredSurahNames = surahNames;
+
   }
 
   void filterSurahs(String query) {

@@ -22,7 +22,7 @@ class _MainNavBarState extends State<MainNavBar> {
 
   static final List<Widget> _pages = [
     const HomePage(),
-    QuizPage(),
+   const  QuizPage(),
     VocabularyPage(),
     FavouritesPage(),
     SettingsPage(),
@@ -64,6 +64,7 @@ class _MainNavBarState extends State<MainNavBar> {
       body: _pages[_selectedIndex],
       endDrawer: SettingsDrawer(),
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         showUnselectedLabels: true,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(

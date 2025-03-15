@@ -7,8 +7,10 @@ import 'package:quran_flutter/models/surah.dart';
 import 'package:quran_flutter/models/verse.dart';
 import 'package:quran_flutter/quran.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:texnokun/ui/widgets/rectangle_icon.dart';
 import 'package:texnokun/ui/widgets/surah_detail.dart';
 import 'package:texnokun/utils/app_styles/app_colors.dart';
+import 'package:texnokun/utils/sizes/app_padding.dart';
 
 import 'package:texnokun/utils/text_styles/text_styles.dart';
 
@@ -25,13 +27,14 @@ class SurahsDetailsPage extends StatefulWidget {
 }
 
 class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
-  final ItemScrollController itemScrollController = ItemScrollController();
   final ScrollOffsetController scrollOffsetController =
       ScrollOffsetController();
-  final ItemPositionsListener itemPositionsListener =
-      ItemPositionsListener.create();
+ 
   final ScrollOffsetListener scrollOffsetListener =
       ScrollOffsetListener.create();
+        final ItemScrollController _scrollController = ItemScrollController();
+  final ItemPositionsListener _positionsListener = ItemPositionsListener.create();
+  bool _isFabVisible = false;
 
   late Verse _initialVerse;
   bool _isPlaying = false;
@@ -42,13 +45,14 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
 
+
+
   Surah get surah => Quran.getSurah(widget.surahNumber);
   final ScrollController scrollController = ScrollController();
 
   final fToast = FToast();
 
   void _onPressedPlayButton(Verse verse) async {
-    showBottom();
     setState(() {});
     if (_isPlaying) {
       await _player.stop().then((_) => setState(() => _isPlaying = false));
@@ -64,67 +68,6 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
         .play(DeviceFileSource(audioPath))
         .then((_) => setState(() => _isPlaying = true));
     print(((verse == _initialVerse) && _isPlaying));
-  }
-
-  void showBottom() {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20), color: Colors.white),
-        height: 100,
-        child: Center(
-          child: Column(
-            children: [
-              Slider(
-                  activeColor: AppColors.mainColor,
-                  min: 0,
-                  max: duration.inSeconds.toDouble(),
-                  value: position.inSeconds.toDouble(),
-                  onChanged: (value) async {}),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.skip_previous,
-                      size: 30,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      if (_isPlaying) {
-                        _player.pause();
-                        setState(() {
-                          _isPlaying = false;
-                        });
-                      } else {
-                        _player.resume();
-                        setState(() {
-                          _isPlaying = true;
-                        });
-                      }
-                    },
-                    icon: Icon(
-                      _isPlaying ? Icons.play_arrow : Icons.pause,
-                      size: 30,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: Icon(
-                      Icons.skip_next,
-                      size: 30,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   void _audioPlayerListener() {
@@ -149,7 +92,7 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
               (_) => setState(() => _isPlaying = true),
             );
 
-        itemScrollController.scrollTo(
+        _scrollController.scrollTo(
           index: _initialVerse.verseNumber - 1,
           duration: const Duration(milliseconds: 500),
           curve: Curves.easeInOutCubic,
@@ -165,6 +108,28 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
   @override
   void initState() {
     super.initState();
+
+
+ _positionsListener.itemPositions.addListener(() {
+      final positions = _positionsListener.itemPositions.value;
+      
+      // Agar foydalanuvchi pastga tushgan bo'lsa, FAB ko‘rinadi
+      if (positions.isNotEmpty && positions.first.index > 2) {
+        if (!_isFabVisible) {
+          setState(() {
+            _isFabVisible = true;
+          });
+        }
+      } else {
+        if (_isFabVisible) {
+          setState(() {
+            _isFabVisible = false;
+          });
+        }
+      }
+    });
+
+
     setState(() {
       _initialVerse =
           Quran.getVerse(surahNumber: widget.surahNumber, verseNumber: 1);
@@ -188,6 +153,7 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
         position = newPosition;
       });
     });
+
   }
 
   _showToast(String toastText) {
@@ -224,6 +190,10 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
     );
   }
 
+
+
+
+
   @override
   Widget build(BuildContext context) {
     String surahName = Quran.getSurahNameEnglish(widget.surahNumber);
@@ -252,13 +222,13 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
       ),
       body: ScrollablePositionedList.builder(
         itemCount: list.length,
-        itemScrollController: itemScrollController,
+        itemScrollController: _scrollController,
         scrollOffsetController: scrollOffsetController,
-        itemPositionsListener: itemPositionsListener,
+        itemPositionsListener: _positionsListener,
         scrollOffsetListener: scrollOffsetListener,
         itemBuilder: (context, index) {
           final item = list[index];
-
+      
           return SurahDetailItemScreen(
             verse: item,
             initialVerse: _initialVerse,
@@ -304,6 +274,32 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
           );
         },
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: _isFabVisible? Container(
+        padding: Dis.only(tb: 8, lr: 5),
+        decoration: BoxDecoration(
+            color: AppColors.backColor,
+            borderRadius: BorderRadius.circular(10)),
+        height: MediaQuery.of(context).size.height*0.09,
+        width: MediaQuery.of(context).size.width*0.7,
+        child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: list.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding:Dis.only(lr: 3),
+                child: RectangleIcon(
+                  icon: Text('${index + 1}'),
+                  onTap: () {
+                    print(list.length);
+                  },
+                  height: 40,
+                  width: 50,
+                  color: AppColors.mainColor,
+                ),
+              );
+            }),
+      ):null,
     );
   }
 }

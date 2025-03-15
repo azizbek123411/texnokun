@@ -47,7 +47,8 @@ dependencies:
   permission_handler: ^11.3.1
   fluttertoast: ^8.2.12
   scrollable_positioned_list: ^0.3.8
-  assets_audio_player: ^3.1.1
+  
+  
 
 dev_dependencies:
   flutter_test:

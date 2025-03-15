@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:texnokun/utils/sizes/app_padding.dart';
 import 'package:texnokun/utils/text_styles/text_font_size.dart';
 import 'package:texnokun/utils/text_styles/text_styles.dart';
 
@@ -21,6 +22,7 @@ class SurahCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        margin: Dis.only(bottom: 5),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
