@@ -20,7 +20,10 @@ import '../../utils/text_styles/text_font_size.dart';
 class SurahsDetailsPage extends StatefulWidget {
   final int surahNumber;
 
-  const SurahsDetailsPage({super.key, required this.surahNumber});
+  const SurahsDetailsPage({
+    super.key,
+    required this.surahNumber,
+  });
 
   @override
   State<SurahsDetailsPage> createState() => _SurahsDetailsPageState();
@@ -48,16 +51,15 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
   Surah get surah => Quran.getSurah(widget.surahNumber);
 
   final fToast = FToast();
-  int _initialIndex=0;
+  int _initialIndex = 0;
 
   void chooseVerse(int index) {
     _scrollController.scrollTo(
-      index: index,
-      duration: Duration(
-        milliseconds: 300,
-      ),
-      curve: Curves.bounceIn
-    );
+        index: index,
+        duration:const  Duration(
+          milliseconds: 300,
+        ),
+        curve: Curves.bounceIn);
   }
 
   void _onPressedPlayButton(Verse verse) async {
@@ -193,9 +195,10 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
       toastDuration: const Duration(seconds: 4),
     );
   }
+
   @override
   void dispose() {
-   _positionsListener;
+    _positionsListener;
     super.dispose();
   }
 
@@ -299,13 +302,15 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
                         onTap: () {
                           chooseVerse(index);
                           setState(() {
-                            _initialIndex=index;
+                            _initialIndex = index;
                           });
                           print(_initialIndex);
                         },
                         height: 40,
                         width: 50,
-                        color: _initialIndex==index?AppColors.mainColor:AppColors.whiteColor,
+                        color: _initialIndex == index
+                            ? AppColors.mainColor
+                            : AppColors.whiteColor,
                       ),
                     );
                   }),

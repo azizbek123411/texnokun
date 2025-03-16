@@ -26,12 +26,12 @@ class SurahCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
+              color: Colors.grey,
               spreadRadius: 1,
               blurRadius: 5,
-              offset: const Offset(0, 3),
+              offset:  Offset(0, 3),
             ),
           ],
         ),

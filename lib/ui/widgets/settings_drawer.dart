@@ -135,6 +135,7 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
             ),
           ),
           CheckboxListTile(
+            activeColor: AppColors.mainColor,
               title: Text(
                 'Amiri font',
                 style: GoogleFonts.amiri(),
@@ -146,6 +147,7 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                 }
               }),
           CheckboxListTile(
+            activeColor: AppColors.mainColor,
               title: Text(
                 'Scheherazade font',
                 style: GoogleFonts.scheherazadeNew(),
@@ -157,6 +159,7 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                 }
               }),
           CheckboxListTile(
+            activeColor: AppColors.mainColor,
              title: Text(
                 'Lateef font',
                 style: GoogleFonts.lateef(),
@@ -168,6 +171,7 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                 }
               }),
           CheckboxListTile(
+            activeColor: AppColors.mainColor,
              title: Text(
                 'Qahiri font',
                 style: GoogleFonts.qahiri(),

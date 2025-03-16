@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:texnokun/service/audio_service.dart';
 import 'package:texnokun/ui/pages/navbar_pages/favourites_page.dart';
 import 'package:texnokun/ui/pages/navbar_pages/home_page.dart';
@@ -12,6 +13,8 @@ import 'package:texnokun/utils/text_styles/text_font_size.dart';
 import 'package:texnokun/utils/text_styles/text_styles.dart';
 
 class MainNavBar extends StatefulWidget {
+
+
   @override
   _MainNavBarState createState() => _MainNavBarState();
 }
@@ -20,33 +23,85 @@ class _MainNavBarState extends State<MainNavBar> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _selectedIndex = 0;
 
-  static final List<Widget> _pages = [
-    const HomePage(),
-   const  QuizPage(),
-    VocabularyPage(),
-    FavouritesPage(),
-    SettingsPage(),
-  ];
+  final PersistentTabController _controller =
+      PersistentTabController(initialIndex: 0);
 
-  void _onItemTapped(int index)async {
+  static List<Widget> _pages() {
+    return [
+      const HomePage(),
+      const QuizPage(),
+      VocabularyPage(),
+      FavouritesPage(),
+      SettingsPage(),
+    ];
+  }
+
+  List<PersistentBottomNavBarItem> _navBarItems() {
+    return [
+      PersistentBottomNavBarItem(
+        icon: const Icon(
+          IconlyLight.home,
+        ),
+        title: 'Home',
+        activeColorPrimary: AppColors.mainColor,
+        inactiveColorPrimary: AppColors.backColor,
+      ),
+      PersistentBottomNavBarItem(
+        icon: const Icon(
+          IconlyLight.tickSquare,
+        ),
+        title: 'Quiz',
+        activeColorPrimary: AppColors.mainColor,
+        inactiveColorPrimary: AppColors.backColor,
+      ),
+      PersistentBottomNavBarItem(
+        icon: const Icon(
+          IconlyLight.paper,
+        ),
+        title: 'Vocublary',
+        activeColorPrimary: AppColors.mainColor,
+        inactiveColorPrimary: AppColors.backColor,
+      ),
+      PersistentBottomNavBarItem(
+        icon: const Icon(
+          IconlyLight.bookmark,
+        ),
+        title: 'Favourites',
+        activeColorPrimary: AppColors.mainColor,
+        inactiveColorPrimary: AppColors.backColor,
+      ),
+      PersistentBottomNavBarItem(
+        icon: const Icon(
+          IconlyLight.setting,
+        ),
+        title: 'Settings',
+        activeColorPrimary: AppColors.mainColor,
+        inactiveColorPrimary: AppColors.backColor,
+      ),
+    ];
+  }
+
+  void _onItemTapped(int index) async {
     if (index == 4) {
       _scaffoldKey.currentState?.openEndDrawer();
-    } 
-  else {
+      _controller.jumpToTab(0);
+    } else {
       setState(() {
         _selectedIndex = index;
       });
     }
   }
+
   @override
   void initState() {
     super.initState();
     initPermiPermission();
   }
 
-  void initPermiPermission()async{
+  void initPermiPermission() async {
     await AudioServices().initPermission();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,38 +116,16 @@ class _MainNavBarState extends State<MainNavBar> {
           ),
         ),
       ),
-      body: _pages[_selectedIndex],
-      endDrawer: SettingsDrawer(),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        showUnselectedLabels: true,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(IconlyLight.home),
-            label: 'Home',
-          ),
-            BottomNavigationBarItem(
-            icon: Icon(IconlyLight.tickSquare),
-            label: 'Quiz',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(IconlyLight.paper),
-            label: 'Vocabulary',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(IconlyLight.bookmark),
-            label: 'Favourites',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(IconlyLight.setting),
-            label: 'Settings',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: AppColors.mainColor,
-        unselectedItemColor: Colors.grey,
-        onTap: _onItemTapped,
+      body: PersistentTabView(
+        
+      context,
+        onItemSelected: _onItemTapped,
+        screens: _pages(),
+        controller: _controller,
+        items: _navBarItems(),
+        navBarStyle: NavBarStyle.style9,
       ),
+      endDrawer: SettingsDrawer(),
     );
   }
 }

@@ -13,6 +13,7 @@ import '../surahs_details_page.dart';
 
 
 class HomePage extends StatefulWidget {
+  
   const HomePage({super.key});
 
   @override
