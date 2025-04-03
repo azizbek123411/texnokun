@@ -50,88 +50,120 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
 
   Surah get surah => Quran.getSurah(widget.surahNumber);
 
-  final fToast = FToast();
   int _initialIndex = 0;
+  
 
   void chooseVerse(int index) {
     _scrollController.scrollTo(
         index: index,
         duration: const Duration(
-          milliseconds: 300,
+          milliseconds: 150,
         ),
         curve: Curves.bounceIn);
   }
-   void _showBottomSheet() {
-    setState(() {
-    });
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return Container(
-              padding: const EdgeInsets.all(16.0),
-              height: MediaQuery.of(context).size.height * 0.15,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Slider(
-                      onChanged: (value) async {
-                      final position = Duration(seconds: value.toInt());
-                      await player.seek(position);
-                      await player.resume();
-                    },
-                    autofocus: true,
-                    activeColor: AppColors.mainColor,
-                    min: 0,
-                    value: position.inSeconds.toDouble(),
-                    max: duration.inSeconds.toDouble(),
-                  
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.skip_previous),
-                        onPressed: () {
-                          // Previous audio logic
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(_isPlaying ? Icons.pause : Icons.play_arrow),
-                        onPressed: () {
-                          if (_isPlaying) {
-                            player.pause();
-                          } else {
-                            player.resume();
-                          }
-                          setState(() {
-                            _isPlaying = !_isPlaying;
-                          });
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.skip_next),
-                        onPressed: () {
-                          // Next audio logic
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    ).whenComplete(() {
-      player.stop();
-      setState(() {
-        _isPlaying = false;
-      });
-    });
+  void _showBottomSheet() {
+  if (duration == Duration.zero) {
+    Fluttertoast.showToast(
+      msg: "Please wait until the audio is loaded",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: AppColors.mainColor,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+    return;
   }
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter bottomSheetSetState) {
+          player.onPositionChanged.listen((newPosition) {
+            bottomSheetSetState(() {
+              position=newPosition;
+            },);
+          },);
+          return Container(
+            padding: const EdgeInsets.all(16.0),
+            height: MediaQuery.of(context).size.height * 0.15,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Slider(
+                  onChanged: (value) async {
+                    final newPosition = Duration(seconds: value.toInt());
+                    await player.seek(newPosition);
+                    setState(() {
+                      position = newPosition; 
+                    });
+                    bottomSheetSetState(() {
+                      position = newPosition; 
+                    });
+                  },
+                  autofocus: true,
+                  activeColor: AppColors.mainColor,
+                  min: 0,
+                  value: position.inSeconds
+                      .clamp(0, duration.inSeconds)
+                      .toDouble(),
+                  max: duration.inSeconds.toDouble(),
+                  onChangeStart: (value) {
+                    player.pause();
+                  },
+                  onChangeEnd: (value) async {
+                    final newPosition = Duration(seconds: value.toInt());
+                    await player.seek(newPosition);
+                    await player.resume();
+                  },
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.skip_previous),
+                      onPressed: () {
+                        // Previous audio logic
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(_isPlaying ? Icons.pause : Icons.play_arrow),
+                      onPressed: () {
+                        if (_isPlaying) {
+                          player.pause();
+                        } else {
+                          player.resume();
+                        }
+                        setState(() {
+                          _isPlaying = !_isPlaying;
+                        });
+                        bottomSheetSetState(() {}); 
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.skip_next),
+                      onPressed: () {
+                        // Next audio logic
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  ).whenComplete(() {
+    player.stop();
+    setState(() {
+      _isPlaying = false;
+    });
+  });
+}
+
+ 
 
   void _onPressedPlayButton(Verse verse) async {
     setState(() {});
@@ -152,8 +184,6 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
 
     _showBottomSheet();
   }
-
- 
 
   void _audioPlayerListener() {
     player.onPlayerComplete.listen((event) async {
@@ -179,7 +209,7 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
 
         _scrollController.scrollTo(
           index: _initialVerse.verseNumber - 1,
-          duration: const Duration(milliseconds: 500),
+          duration: const Duration(milliseconds: 200),
           curve: Curves.easeInOutCubic,
         );
       } else {
@@ -210,6 +240,12 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
       setState(() {
         position = newPosition;
       });
+      if(mounted){
+       setState(() {
+          position = newPosition;
+       });
+      }
+      print("Position:$position, Duration:$duration");    
     });
     _positionsListener.itemPositions.addListener(() {
       final positions = _positionsListener.itemPositions.value;
@@ -235,15 +271,11 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
     });
 
     _audioPlayerListener();
-   
-
-
   }
-
-  
 
   @override
   void dispose() {
+    player.dispose();
     _positionsListener;
     super.dispose();
   }
@@ -291,7 +323,6 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
             surahNumber: widget.surahNumber,
             onPressedPlayButton: () {
               _onPressedPlayButton(item);
-            
             },
             play10: () {
               setState(() {
