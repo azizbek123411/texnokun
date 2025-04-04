@@ -47,11 +47,11 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
   final _audioService = AudioServices();
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
+  late FToast fToast;
 
   Surah get surah => Quran.getSurah(widget.surahNumber);
 
   int _initialIndex = 0;
-  
 
   void chooseVerse(int index) {
     _scrollController.scrollTo(
@@ -61,109 +61,202 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
         ),
         curve: Curves.bounceIn);
   }
-  void _showBottomSheet() {
-  if (duration == Duration.zero) {
-    Fluttertoast.showToast(
-      msg: "Please wait until the audio is loaded",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      backgroundColor: AppColors.mainColor,
-      textColor: Colors.white,
-      fontSize: 16.0,
+
+
+  _showToasT(){
+    final toast=Container(
+      padding: Dis.all(10),
+        decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25.0),
+        color: AppColors.mainColor,
+        ),  
+        child: const Text('Please,wait until loading',style: TextStyle(
+          color: AppColors.whiteColor,
+        ),),
+     
     );
-    return;
+        
+      fToast.showToast(
+        child: toast,
+        toastDuration:const Duration(seconds: 3),
+        gravity: ToastGravity.CENTER,
+       
+      );
+      return;
+    
   }
 
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    builder: (context) {
-      return StatefulBuilder(
-        builder: (BuildContext context, StateSetter bottomSheetSetState) {
-          player.onPositionChanged.listen((newPosition) {
-            bottomSheetSetState(() {
-              position=newPosition;
-            },);
-          },);
-          return Container(
-            padding: const EdgeInsets.all(16.0),
-            height: MediaQuery.of(context).size.height * 0.15,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Slider(
-                  onChanged: (value) async {
-                    final newPosition = Duration(seconds: value.toInt());
-                    await player.seek(newPosition);
-                    setState(() {
-                      position = newPosition; 
-                    });
-                    bottomSheetSetState(() {
-                      position = newPosition; 
-                    });
-                  },
-                  autofocus: true,
-                  activeColor: AppColors.mainColor,
-                  min: 0,
-                  value: position.inSeconds
-                      .clamp(0, duration.inSeconds)
-                      .toDouble(),
-                  max: duration.inSeconds.toDouble(),
-                  onChangeStart: (value) {
-                    player.pause();
-                  },
-                  onChangeEnd: (value) async {
-                    final newPosition = Duration(seconds: value.toInt());
-                    await player.seek(newPosition);
-                    await player.resume();
-                  },
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.skip_previous),
-                      onPressed: () {
-                        // Previous audio logic
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(_isPlaying ? Icons.pause : Icons.play_arrow),
-                      onPressed: () {
-                        if (_isPlaying) {
-                          player.pause();
-                        } else {
-                          player.resume();
-                        }
-                        setState(() {
-                          _isPlaying = !_isPlaying;
-                        });
-                        bottomSheetSetState(() {}); 
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.skip_next),
-                      onPressed: () {
-                        // Next audio logic
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          );
-        },
-      );
-    },
-  ).whenComplete(() {
-    player.stop();
-    setState(() {
-      _isPlaying = false;
-    });
-  });
-}
+  void _showBottomSheet() {
+ _showToasT();
 
- 
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter bottomSheetSetState) {
+            player.onPositionChanged.listen(
+              (newPosition) {
+                bottomSheetSetState(
+                  () {
+                    position = newPosition;
+                  },
+                );
+              },
+            );
+            return Container(
+              padding: const EdgeInsets.all(16.0),
+              height: MediaQuery.of(context).size.height * 0.15,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Slider(
+                    onChanged: (value) async {
+                      final newPosition = Duration(seconds: value.toInt());
+                      await player.seek(newPosition);
+                      setState(() {
+                        position = newPosition;
+                      });
+                     
+                    },
+                    autofocus: true,
+                    activeColor: AppColors.mainColor,
+                    min: 0,
+                    value: position.inSeconds
+                        .clamp(0, duration.inSeconds)
+                        .toDouble(),
+                    max: duration.inSeconds.toDouble(),
+                    onChangeStart: (value) {
+                      player.pause();
+                    },
+                    onChangeEnd: (value) async {
+                      final newPosition = Duration(seconds: value.toInt());
+                      await player.seek(newPosition);
+                      await player.resume();
+                    },
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                          icon: const Icon(Icons.skip_previous),
+                          onPressed: () async {
+                            // Previous audio logic
+                            _showToasT();
+                            if (_currentRepeat < _repeatCount - 1) {
+                              _currentRepeat++;
+                              if (_initialVerse.verseNumber > 1) {
+                                final audioPath =
+                                    await _audioService.downloadAudio(
+                                        widget.surahNumber,
+                                        _initialVerse.verseNumber);
+                                await player
+                                    .play(DeviceFileSource(audioPath))
+                                    .then(
+                                      (_) => setState(() => _isPlaying = true),
+                                    );
+                              } else {
+                                return;
+                              }
+                            } if(_initialVerse.verseNumber>0){ if (surah.verseCount >
+                                _initialVerse.verseNumber) {
+                              _currentRepeat = 0;
+
+                              final oldVerseNumber =
+                                  _initialVerse.verseNumber - 1;
+                              _initialVerse = Quran.getVerse(
+                                  surahNumber: surah.number,
+                                  verseNumber: oldVerseNumber);
+                              final audioPath =
+                                  await _audioService.downloadAudio(
+                                      widget.surahNumber,
+                                      _initialVerse.verseNumber);
+                              await player
+                                  .play(DeviceFileSource(audioPath))
+                                  .then(
+                                    (_) => setState(() => _isPlaying = true),
+                                  );
+
+                              _scrollController.scrollTo(
+                                index: _initialVerse.verseNumber - 1,
+                                duration: const Duration(milliseconds: 200),
+                                curve: Curves.easeInOutCubic,
+                              );
+                            } }else {
+                              setState(() {
+                                _isPlaying = false;
+                              });
+                            }
+                          }),
+                      IconButton(
+                        icon: Icon(_isPlaying ? Icons.pause : Icons.play_arrow),
+                        onPressed: () {
+                          if (_isPlaying) {
+                            player.pause();
+                          } else {
+                            player.resume();
+                          }
+                          setState(() {
+                            _isPlaying = !_isPlaying;
+                          });
+                        
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.skip_next),
+                        onPressed: () async {
+                          // Next audio logic
+                          _showToasT();
+                          if (_currentRepeat < _repeatCount - 1) {
+                            _currentRepeat++;
+
+                            final audioPath = await _audioService.downloadAudio(
+                                widget.surahNumber, _initialVerse.verseNumber);
+                            await player.play(DeviceFileSource(audioPath)).then(
+                                  (_) => setState(() => _isPlaying = true),
+                                );
+                          } else if (surah.verseCount >
+                              _initialVerse.verseNumber) {
+                            _currentRepeat = 0;
+
+                            final oldVerseNumber =
+                                _initialVerse.verseNumber + 1;
+                            _initialVerse = Quran.getVerse(
+                                surahNumber: surah.number,
+                                verseNumber: oldVerseNumber);
+                            final audioPath = await _audioService.downloadAudio(
+                                widget.surahNumber, _initialVerse.verseNumber);
+                            await player.play(DeviceFileSource(audioPath)).then(
+                                  (_) => setState(() => _isPlaying = true),
+                                );
+
+                            _scrollController.scrollTo(
+                              index: _initialVerse.verseNumber - 1,
+                              duration: const Duration(milliseconds: 200),
+                              curve: Curves.easeInOutCubic,
+                            );
+                          } else {
+                            setState(() {
+                              _isPlaying = false;
+                            });
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    ).whenComplete(() {
+      player.stop();
+      setState(() {
+        _isPlaying = false;
+      });
+    });
+  }
 
   void _onPressedPlayButton(Verse verse) async {
     setState(() {});
@@ -180,7 +273,6 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
     await player
         .play(DeviceFileSource(audioPath))
         .then((_) => setState(() => _isPlaying = true));
-    print(((verse == _initialVerse) && _isPlaying));
 
     _showBottomSheet();
   }
@@ -223,7 +315,8 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
   @override
   void initState() {
     super.initState();
-
+    fToast=FToast();
+    fToast.init(context);
     player.onPlayerStateChanged.listen((state) {
       setState(() {
         _isPlaying = state == PlayerState.playing;
@@ -240,17 +333,12 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
       setState(() {
         position = newPosition;
       });
-      if(mounted){
-       setState(() {
-          position = newPosition;
-       });
-      }
-      print("Position:$position, Duration:$duration");    
+     
     });
     _positionsListener.itemPositions.addListener(() {
       final positions = _positionsListener.itemPositions.value;
 
-      if (positions.isNotEmpty && positions.first.index > 2) {
+      if (positions.isNotEmpty && positions.first.index > 1) {
         if (!_isFabVisible) {
           setState(() {
             _isFabVisible = true;
@@ -377,7 +465,6 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
                           setState(() {
                             _initialIndex = index;
                           });
-                          print(_initialIndex);
                         },
                         height: 40,
                         width: 50,

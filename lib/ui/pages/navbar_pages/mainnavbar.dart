@@ -14,6 +14,7 @@ import 'package:texnokun/utils/text_styles/text_styles.dart';
 
 class MainNavBar extends StatefulWidget {
 
+ static  String id='home';
 
   @override
   _MainNavBarState createState() => _MainNavBarState();
@@ -21,7 +22,6 @@ class MainNavBar extends StatefulWidget {
 
 class _MainNavBarState extends State<MainNavBar> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  int _selectedIndex = 0;
 
   final PersistentTabController _controller =
       PersistentTabController(initialIndex: 0);
@@ -87,7 +87,6 @@ class _MainNavBarState extends State<MainNavBar> {
       _controller.jumpToTab(0);
     } else {
       setState(() {
-        _selectedIndex = index;
       });
     }
   }
