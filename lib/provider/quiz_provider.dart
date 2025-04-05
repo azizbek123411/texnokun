@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import '../service/quiz_service.dart';
 
 class QuizProvider with ChangeNotifier {
+
+bool _isLoading=false;
+bool  get isLoading =>_isLoading;
+
   final QuranService _quranService = QuranService();
   List<AyahModel> _questions = [];
   int _currentIndex = 0;
@@ -13,9 +17,12 @@ class QuizProvider with ChangeNotifier {
   int get score => _score;
 
   void startQuiz(int surahNumber) {
+    _isLoading=true;
+    notifyListeners();
     _questions =  _quranService.getRandomAyahs(surahNumber, 6);
     _currentIndex = 0;
     _score = 0;
+    _isLoading=false;
     notifyListeners();
   }
 

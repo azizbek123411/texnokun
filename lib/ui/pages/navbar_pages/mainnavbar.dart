@@ -116,6 +116,7 @@ class _MainNavBarState extends State<MainNavBar> {
         ),
       ),
       body: PersistentTabView(
+        handleAndroidBackButtonPress: false,
         
       context,
         onItemSelected: _onItemTapped,

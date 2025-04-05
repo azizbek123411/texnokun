@@ -16,8 +16,9 @@ class QuizScreen extends StatelessWidget {
     return Consumer<QuizProvider>(
       builder: (context, quizProvider, child) {
         if (quizProvider.questions.isEmpty) {
-          return const Scaffold(body: Center(child: Text("Loading questions...")));
-        }
+          return const Scaffold(
+              body: Center(child: Text("Loading questions...")));
+        }else{
 
         final currentQuestion =
             quizProvider.questions[quizProvider.currentIndex];
@@ -38,7 +39,7 @@ class QuizScreen extends StatelessWidget {
             backgroundColor: Colors.white,
             title: const Text(
               "Quiz",
-              style:  TextStyle(
+              style: TextStyle(
                 color: AppColors.mainColor,
               ),
             ),
@@ -51,43 +52,46 @@ class QuizScreen extends StatelessWidget {
                 children: [
                   Text(
                     currentQuestion.arabic,
-                    style: AppTextStyle.instance.w700.copyWith(fontSize: FontSizeConst.instance.extraLargeFont,),
+                    style: AppTextStyle.instance.w700.copyWith(
+                      fontSize: FontSizeConst.instance.extraLargeFont,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 20),
-                  ...options.map((option) => Padding(
-                    padding: Dis.only(tb: 5.h),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.backColor,
-                        border: Border.all(color: AppColors.backColor),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: ListTile(
-                        onTap: () {
-                          quizProvider.answerQuestion(option);
-                          if (quizProvider.currentIndex >=
-                              quizProvider.questions.length - 1) {
-                          showDialog(context: context, builder: (context){
-                            return const ResultDialog();
-              
-                          }).then((event){
-                            Navigator.pop(context);
-                          });
-                          }
-                          
-                        }, 
-                        title: Text(option), 
+                  ...options.map(
+                    (option) => Padding(
+                      padding: Dis.only(tb: 5.h),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.backColor,
+                          border: Border.all(color: AppColors.backColor),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: ListTile(
+                          onTap: () {
+                            quizProvider.answerQuestion(option);
+                            if (quizProvider.currentIndex >=
+                                quizProvider.questions.length - 1) {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return const ResultDialog();
+                                  }).then((event) {
+                                Navigator.pop(context);
+                              });
+                            }
+                          },
+                          title: Text(option),
+                        ),
                       ),
                     ),
-                  ),
                   )
                 ],
               ),
             ),
           ),
         );
-      },
+      }}
     );
   }
 }
