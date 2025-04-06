@@ -19,7 +19,7 @@ class _QuizPageState extends State<QuizPage> {
   final surahList = Quran.getSurahAsList();
 _showCircular(){
   return showDialog(context: context, builder: (context){
-    return Center(
+    return const Center(
       child: CircularProgressIndicator()
     ) ;
   });
@@ -38,7 +38,7 @@ _showCircular(){
             return ListTile(
               onTap: () async {
                 _showCircular();
-                await Future.delayed(Duration(milliseconds: 300),
+                await Future.delayed(const Duration(milliseconds: 300),
                 
                 );
                 

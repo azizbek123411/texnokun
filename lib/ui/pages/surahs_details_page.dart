@@ -49,6 +49,7 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
   Duration position = Duration.zero;
   late FToast fToast;
 
+int currentSurahIndex=0;
   Surah get surah => Quran.getSurah(widget.surahNumber);
 
   int _initialIndex = 0;
@@ -62,33 +63,30 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
         curve: Curves.bounceIn);
   }
 
-
-  _showToasT(){
-    final toast=Container(
+  _showToasT() {
+    final toast = Container(
       padding: Dis.all(10),
-        decoration: BoxDecoration(
+      decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(25.0),
         color: AppColors.mainColor,
-        ),  
-        child: const Text('Please,wait until loading',style: TextStyle(
+      ),
+      child: const Text(
+        'Please,wait until loading',
+        style: TextStyle(
           color: AppColors.whiteColor,
-        ),),
-     
+        ),
+      ),
     );
-        
-      fToast.showToast(
-        child: toast,
-        toastDuration:const Duration(seconds: 3),
-        gravity: ToastGravity.CENTER,
-       
-      );
-      return;
-    
+
+    fToast.showToast(
+      child: toast,
+      toastDuration: const Duration(seconds: 3),
+      gravity: ToastGravity.CENTER,
+    );
+    return;
   }
 
   void _showBottomSheet() {
- _showToasT();
-
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -117,7 +115,6 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
                       setState(() {
                         position = newPosition;
                       });
-                     
                     },
                     autofocus: true,
                     activeColor: AppColors.mainColor,
@@ -141,8 +138,6 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
                       IconButton(
                           icon: const Icon(Icons.skip_previous),
                           onPressed: () async {
-                            // Previous audio logic
-                            _showToasT();
                             if (_currentRepeat < _repeatCount - 1) {
                               _currentRepeat++;
                               if (_initialVerse.verseNumber > 1) {
@@ -158,31 +153,34 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
                               } else {
                                 return;
                               }
-                            } if(_initialVerse.verseNumber>0){ if (surah.verseCount >
-                                _initialVerse.verseNumber) {
-                              _currentRepeat = 0;
+                            }
+                            if (_initialVerse.verseNumber > 0) {
+                              if (surah.verseCount >
+                                  _initialVerse.verseNumber) {
+                                _currentRepeat = 0;
 
-                              final oldVerseNumber =
-                                  _initialVerse.verseNumber - 1;
-                              _initialVerse = Quran.getVerse(
-                                  surahNumber: surah.number,
-                                  verseNumber: oldVerseNumber);
-                              final audioPath =
-                                  await _audioService.downloadAudio(
-                                      widget.surahNumber,
-                                      _initialVerse.verseNumber);
-                              await player
-                                  .play(DeviceFileSource(audioPath))
-                                  .then(
-                                    (_) => setState(() => _isPlaying = true),
-                                  );
+                                final oldVerseNumber =
+                                    _initialVerse.verseNumber - 1;
+                                _initialVerse = Quran.getVerse(
+                                    surahNumber: surah.number,
+                                    verseNumber: oldVerseNumber);
+                                final audioPath =
+                                    await _audioService.downloadAudio(
+                                        widget.surahNumber,
+                                        _initialVerse.verseNumber);
+                                await player
+                                    .play(DeviceFileSource(audioPath))
+                                    .then(
+                                      (_) => setState(() => _isPlaying = true),
+                                    );
 
-                              _scrollController.scrollTo(
-                                index: _initialVerse.verseNumber - 1,
-                                duration: const Duration(milliseconds: 200),
-                                curve: Curves.easeInOutCubic,
-                              );
-                            } }else {
+                                _scrollController.scrollTo(
+                                  index: _initialVerse.verseNumber - 1,
+                                  duration: const Duration(milliseconds: 200),
+                                  curve: Curves.easeInOutCubic,
+                                );
+                              }
+                            } else {
                               setState(() {
                                 _isPlaying = false;
                               });
@@ -199,13 +197,11 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
                           setState(() {
                             _isPlaying = !_isPlaying;
                           });
-                        
                         },
                       ),
                       IconButton(
                         icon: const Icon(Icons.skip_next),
                         onPressed: () async {
-                          // Next audio logic
                           _showToasT();
                           if (_currentRepeat < _repeatCount - 1) {
                             _currentRepeat++;
@@ -265,7 +261,7 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
 
       return;
     }
-
+    _showToasT();
     _initialVerse = verse;
     final audioPath = await _audioService.downloadAudio(
         widget.surahNumber, verse.verseNumber);
@@ -315,8 +311,10 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
   @override
   void initState() {
     super.initState();
-    fToast=FToast();
+    fToast = FToast();
+    currentSurahIndex = widget.surahNumber;
     fToast.init(context);
+    
     player.onPlayerStateChanged.listen((state) {
       setState(() {
         _isPlaying = state == PlayerState.playing;
@@ -333,7 +331,6 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
       setState(() {
         position = newPosition;
       });
-     
     });
     _positionsListener.itemPositions.addListener(() {
       final positions = _positionsListener.itemPositions.value;
@@ -368,6 +365,8 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
     super.dispose();
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     String surahName = Quran.getSurahNameEnglish(widget.surahNumber);
@@ -395,54 +394,55 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
         ),
       ),
       body: ScrollablePositionedList.builder(
-        itemCount: list.length,
-        itemScrollController: _scrollController,
-        scrollOffsetController: scrollOffsetController,
-        itemPositionsListener: _positionsListener,
-        scrollOffsetListener: scrollOffsetListener,
-        itemBuilder: (context, index) {
-          final item = list[index];
-
-          return SurahDetailItemScreen(
-            verse: item,
-            initialVerse: _initialVerse,
-            isPlaying: _isPlaying,
-            repeatCount: _repeatCount,
-            surahNumber: widget.surahNumber,
-            onPressedPlayButton: () {
-              _onPressedPlayButton(item);
-            },
-            play10: () {
-              setState(() {
-                _repeatCount = 10;
-                _currentRepeat = 0;
-              });
-              _onPressedPlayButton(item);
-            },
-            play20: () {
-              setState(() {
-                _repeatCount = 20;
-                _currentRepeat = 0;
-              });
-              _onPressedPlayButton(item);
-            },
-            play15: () {
-              setState(() {
-                _repeatCount = 15;
-                _currentRepeat = 0;
-              });
-              _onPressedPlayButton(item);
-            },
-            play5: () {
-              setState(() {
-                _repeatCount = 5;
-                _currentRepeat = 0;
-              });
-              _onPressedPlayButton(item);
-            },
-          );
-        },
-      ),
+          itemCount: list.length,
+          itemScrollController: _scrollController,
+          scrollOffsetController: scrollOffsetController,
+          itemPositionsListener: _positionsListener,
+          scrollOffsetListener: scrollOffsetListener,
+          itemBuilder: (context, index) {
+            final item = list[index];
+        
+            return SurahDetailItemScreen(
+              verse: item,
+              initialVerse: _initialVerse,
+              isPlaying: _isPlaying,
+              repeatCount: _repeatCount,
+              surahNumber: widget.surahNumber,
+              onPressedPlayButton: () {
+                _onPressedPlayButton(item);
+              },
+              play10: () {
+                setState(() {
+                  _repeatCount = 10;
+                  _currentRepeat = 0;
+                });
+                _onPressedPlayButton(item);
+              },
+              play20: () {
+                setState(() {
+                  _repeatCount = 20;
+                  _currentRepeat = 0;
+                });
+                _onPressedPlayButton(item);
+              },
+              play15: () {
+                setState(() {
+                  _repeatCount = 15;
+                  _currentRepeat = 0;
+                });
+                _onPressedPlayButton(item);
+              },
+              play5: () {
+                setState(() {
+                  _repeatCount = 5;
+                  _currentRepeat = 0;
+                });
+                _onPressedPlayButton(item);
+              },
+            );
+          
+        
+      }),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: _isFabVisible
           ? Container(
