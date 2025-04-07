@@ -30,13 +30,6 @@ class SurahsDetailsPage extends StatefulWidget {
 }
 
 class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
-  final ScrollOffsetController scrollOffsetController =
-      ScrollOffsetController();
-  final ScrollOffsetListener scrollOffsetListener =
-      ScrollOffsetListener.create();
-  final ItemScrollController _scrollController = ItemScrollController();
-  final ItemPositionsListener _positionsListener =
-      ItemPositionsListener.create();
   bool _isFabVisible = false;
 
   late Verse _initialVerse;
@@ -48,14 +41,28 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
   late FToast fToast;
-
-int currentSurahIndex=0;
+  late int currentIndex;
+  late PageController _pageController;
+  int currentSurahIndex = 0;
   Surah get surah => Quran.getSurah(widget.surahNumber);
+  
+  List<ItemScrollController> scrollControllers =
+    List.generate(114, (_) => ItemScrollController(),growable: true);
+
+List<ItemPositionsListener> positionsListeners =
+    List.generate(114, (_) => ItemPositionsListener.create());
+
+List<ScrollOffsetController> scrollOffsetControllers =
+    List.generate(114, (_) => ScrollOffsetController());
+
+List<ScrollOffsetListener> scrollOffsetListeners =
+    List.generate(114, (_) => ScrollOffsetListener.create());
+
 
   int _initialIndex = 0;
 
   void chooseVerse(int index) {
-    _scrollController.scrollTo(
+    scrollControllers[widget.surahNumber].scrollTo(
         index: index,
         duration: const Duration(
           milliseconds: 150,
@@ -174,7 +181,7 @@ int currentSurahIndex=0;
                                       (_) => setState(() => _isPlaying = true),
                                     );
 
-                                _scrollController.scrollTo(
+                                scrollControllers[widget.surahNumber].scrollTo(
                                   index: _initialVerse.verseNumber - 1,
                                   duration: const Duration(milliseconds: 200),
                                   curve: Curves.easeInOutCubic,
@@ -226,7 +233,7 @@ int currentSurahIndex=0;
                                   (_) => setState(() => _isPlaying = true),
                                 );
 
-                            _scrollController.scrollTo(
+                            scrollControllers[widget.surahNumber].scrollTo(
                               index: _initialVerse.verseNumber - 1,
                               duration: const Duration(milliseconds: 200),
                               curve: Curves.easeInOutCubic,
@@ -295,7 +302,7 @@ int currentSurahIndex=0;
               (_) => setState(() => _isPlaying = true),
             );
 
-        _scrollController.scrollTo(
+        scrollControllers[widget.surahNumber].scrollTo(
           index: _initialVerse.verseNumber - 1,
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeInOutCubic,
@@ -311,10 +318,12 @@ int currentSurahIndex=0;
   @override
   void initState() {
     super.initState();
+    currentIndex = widget.surahNumber - 1;
+    _pageController = PageController(initialPage: currentIndex);
     fToast = FToast();
     currentSurahIndex = widget.surahNumber;
     fToast.init(context);
-    
+
     player.onPlayerStateChanged.listen((state) {
       setState(() {
         _isPlaying = state == PlayerState.playing;
@@ -332,8 +341,8 @@ int currentSurahIndex=0;
         position = newPosition;
       });
     });
-    _positionsListener.itemPositions.addListener(() {
-      final positions = _positionsListener.itemPositions.value;
+    positionsListeners[widget.surahNumber].itemPositions.addListener(() {
+      final positions = positionsListeners[widget.surahNumber].itemPositions.value;
 
       if (positions.isNotEmpty && positions.first.index > 1) {
         if (!_isFabVisible) {
@@ -361,88 +370,64 @@ int currentSurahIndex=0;
   @override
   void dispose() {
     player.dispose();
-    _positionsListener;
+    _pageController.dispose();
+    scrollOffsetControllers[widget.surahNumber];
+    scrollOffsetListeners[widget.surahNumber];
+    positionsListeners[widget.surahNumber];
     super.dispose();
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-    String surahName = Quran.getSurahNameEnglish(widget.surahNumber);
     final list = Quran.getSurahVersesAsList(widget.surahNumber);
 
     return Scaffold(
       backgroundColor: AppColors.backColor,
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(
-            IconlyLight.arrowLeft2,
-            color: Colors.black,
-          ),
-        ),
-        backgroundColor: AppColors.whiteColor,
-        title: Text(
-          surahName.toString(),
-          style: AppTextStyle.instance.w900.copyWith(
-            color: AppColors.mainColor,
-            fontSize: FontSizeConst.instance.largeFont,
-          ),
-        ),
-      ),
-      body: ScrollablePositionedList.builder(
-          itemCount: list.length,
-          itemScrollController: _scrollController,
-          scrollOffsetController: scrollOffsetController,
-          itemPositionsListener: _positionsListener,
-          scrollOffsetListener: scrollOffsetListener,
-          itemBuilder: (context, index) {
-            final item = list[index];
-        
-            return SurahDetailItemScreen(
-              verse: item,
+      body:
+           
+             SurahContentPage(
+              
+              surahNumber: widget.surahNumber ,
+              scrollController: scrollControllers[widget.surahNumber],
+              positionsListener:positionsListeners[widget.surahNumber],
+              list: list,
               initialVerse: _initialVerse,
               isPlaying: _isPlaying,
               repeatCount: _repeatCount,
-              surahNumber: widget.surahNumber,
               onPressedPlayButton: () {
-                _onPressedPlayButton(item);
-              },
-              play10: () {
-                setState(() {
-                  _repeatCount = 10;
-                  _currentRepeat = 0;
-                });
-                _onPressedPlayButton(item);
-              },
-              play20: () {
-                setState(() {
-                  _repeatCount = 20;
-                  _currentRepeat = 0;
-                });
-                _onPressedPlayButton(item);
-              },
-              play15: () {
-                setState(() {
-                  _repeatCount = 15;
-                  _currentRepeat = 0;
-                });
-                _onPressedPlayButton(item);
+                _onPressedPlayButton(_initialVerse);
               },
               play5: () {
                 setState(() {
                   _repeatCount = 5;
                   _currentRepeat = 0;
                 });
-                _onPressedPlayButton(item);
+                _onPressedPlayButton(_initialVerse);
               },
-            );
-          
-        
-      }),
+              play10: () {
+                setState(() {
+                  _repeatCount = 10;
+                  _currentRepeat = 0;
+                });
+                _onPressedPlayButton(_initialVerse);
+              },
+              play15: () {
+                setState(() {
+                  _repeatCount = 15;
+                  _currentRepeat = 0;
+                });
+                _onPressedPlayButton(_initialVerse);
+              },
+              play20: () {
+                setState(() {
+                  _repeatCount = 20;
+                  _currentRepeat = 0;
+                });
+                _onPressedPlayButton(_initialVerse);
+              },
+              scrollOffsetController: scrollOffsetControllers[widget.surahNumber],
+              scrollOffsetListener: scrollOffsetListeners[widget.surahNumber],
+            ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: _isFabVisible
           ? Container(
@@ -476,6 +461,89 @@ int currentSurahIndex=0;
                   }),
             )
           : null,
+    );
+  }
+}
+
+class SurahContentPage extends StatelessWidget {
+  final int surahNumber;
+  final ItemScrollController scrollController;
+  final ItemPositionsListener positionsListener;
+  final List list;
+  final Verse initialVerse;
+  bool isPlaying;
+  int repeatCount;
+  final void Function() play5;
+  final void Function() onPressedPlayButton;
+  final void Function() play10;
+  final void Function() play15;
+  final void Function() play20;
+  final ScrollOffsetController scrollOffsetController;
+  final ScrollOffsetListener scrollOffsetListener;
+  
+  SurahContentPage({
+    super.key,
+    required this.surahNumber,
+    required this.scrollController,
+    required this.positionsListener,
+    required this.list,
+    required this.initialVerse,
+    required this.isPlaying,
+    required this.repeatCount,
+    required this.onPressedPlayButton,
+    required this.play5,
+    required this.play10,
+    required this.play15,
+    required this.play20,
+    required this.scrollOffsetController,
+    required this.scrollOffsetListener,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    String surahName = Quran.getSurahNameEnglish(surahNumber);
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            IconlyLight.arrowLeft2,
+            color: Colors.black,
+          ),
+        ),
+        backgroundColor: AppColors.whiteColor,
+        title: Text(
+          surahName.toString(),
+          style: AppTextStyle.instance.w900.copyWith(
+            color: AppColors.mainColor,
+            fontSize: FontSizeConst.instance.largeFont,
+          ),
+        ),
+      ),
+      body: ScrollablePositionedList.builder(
+          itemCount: list.length,
+          itemScrollController: scrollController,
+          scrollOffsetController: scrollOffsetController,
+          itemPositionsListener: positionsListener,
+          scrollOffsetListener: scrollOffsetListener,
+          itemBuilder: (context, index) {
+            final item = list[index];
+
+            return SurahDetailItemScreen(
+              verse: item,
+              initialVerse: initialVerse,
+              isPlaying: isPlaying,
+              repeatCount: repeatCount,
+              surahNumber: surahNumber,
+              onPressedPlayButton: onPressedPlayButton,
+              play10: play10,
+              play20: play20,
+              play15: play15,
+              play5: play5,
+            );
+          }),
     );
   }
 }

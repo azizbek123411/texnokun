@@ -21,9 +21,19 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-  final List<String> surahNames = List.generate(
+  final List<String> surahNamesEnglish = List.generate(
     114,
-    (index) => quran.getSurahName(index + 1), // Surah numbers start from 1
+    (index) => quran.getSurahName(index + 1),
+  );
+
+  final List<String> surahNamesArabic = List.generate(
+    114,
+    (index) => quran.getSurahNameArabic(index + 1), 
+  );
+
+  final List<String> surahNamesRussian = List.generate(
+    114,
+    (index) => quran.getSurahNameRussian(index + 1,), 
   );
 
   List<String> filteredSurahNames = [];
@@ -33,16 +43,20 @@ class HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    filteredSurahNames = surahNames;
-
+    filteredSurahNames = surahNamesEnglish; 
   }
 
   void filterSurahs(String query) {
-    final filtered = surahNames.where((surah) {
-      final surahLower = surah.toLowerCase();
+    final filtered = List.generate(114, (index) => index + 1).where((index) {
+      final surahEnglish = surahNamesEnglish[index - 1].toLowerCase();
+      final surahArabic = surahNamesArabic[index - 1].toLowerCase();
+      final surahRussian = surahNamesRussian[index - 1].toLowerCase();
       final queryLower = query.toLowerCase();
-      return surahLower.contains(queryLower);
-    }).toList();
+
+      return surahEnglish.contains(queryLower) ||
+          surahArabic.contains(queryLower) ||
+          surahRussian.contains(queryLower);
+    }).map((index) => surahNamesEnglish[index - 1]).toList(); 
 
     setState(() {
       filteredSurahNames = filtered;
@@ -152,13 +166,13 @@ class HomePageState extends State<HomePage> {
                           itemBuilder: (context, index) {
                             return SurahCard(
                               surahName: filteredSurahNames[index],
-                              surahNumber: surahNames.indexOf(filteredSurahNames[index]) + 1,
+                              surahNumber: surahNamesEnglish.indexOf(filteredSurahNames[index]) + 1,
                               onTap: () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => SurahsDetailsPage(
-                                      surahNumber: surahNames.indexOf(filteredSurahNames[index]) + 1,
+                                      surahNumber: surahNamesEnglish.indexOf(filteredSurahNames[index]) + 1,
                                     ),
                                   ),
                                 );
@@ -176,7 +190,7 @@ class HomePageState extends State<HomePage> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => SurahsDetailsPage(
-                                      surahNumber: surahNames.indexOf(filteredSurahNames[index]) + 1,
+                                      surahNumber: surahNamesEnglish.indexOf(filteredSurahNames[index]) + 1,
                                     ),
                                   ),
                                 );
