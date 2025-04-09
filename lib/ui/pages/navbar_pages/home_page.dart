@@ -12,6 +12,11 @@ import 'package:texnokun/utils/text_styles/text_styles.dart';
 import '../surahs_details_page.dart';
 
 
+
+
+
+
+
 class HomePage extends StatefulWidget {
   
   const HomePage({super.key});
@@ -21,6 +26,9 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
+
+List<Widget> pagesList=[];
+
   final List<String> surahNamesEnglish = List.generate(
     114,
     (index) => quran.getSurahName(index + 1),
@@ -35,6 +43,10 @@ class HomePageState extends State<HomePage> {
     114,
     (index) => quran.getSurahNameRussian(index + 1,), 
   );
+
+
+  int initialIndex=0;
+
 
   List<String> filteredSurahNames = [];
   TextEditingController searchController = TextEditingController();
@@ -171,9 +183,14 @@ class HomePageState extends State<HomePage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => SurahsDetailsPage(
+                                    builder: (context) =>PageView.builder(
+                                      itemCount: 114,
+                           itemBuilder: (context,index){
+                            return  SurahsDetailsPage(
                                       surahNumber: surahNamesEnglish.indexOf(filteredSurahNames[index]) + 1,
-                                    ),
+                                    );
+                           },
+                                    )
                                   ),
                                 );
                               },

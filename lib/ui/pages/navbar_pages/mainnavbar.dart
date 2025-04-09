@@ -116,8 +116,6 @@ class _MainNavBarState extends State<MainNavBar> {
         ),
       ),
       body: PersistentTabView(
-
-        
       context,
         onItemSelected: _onItemTapped,
         screens: _pages(),
