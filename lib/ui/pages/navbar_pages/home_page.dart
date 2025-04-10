@@ -11,14 +11,7 @@ import 'package:texnokun/utils/text_styles/text_styles.dart';
 
 import '../surahs_details_page.dart';
 
-
-
-
-
-
-
 class HomePage extends StatefulWidget {
-  
   const HomePage({super.key});
 
   @override
@@ -26,8 +19,7 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-
-List<Widget> pagesList=[];
+ 
 
   final List<String> surahNamesEnglish = List.generate(
     114,
@@ -36,39 +28,42 @@ List<Widget> pagesList=[];
 
   final List<String> surahNamesArabic = List.generate(
     114,
-    (index) => quran.getSurahNameArabic(index + 1), 
+    (index) => quran.getSurahNameArabic(index + 1),
   );
 
   final List<String> surahNamesRussian = List.generate(
     114,
-    (index) => quran.getSurahNameRussian(index + 1,), 
+    (index) => quran.getSurahNameRussian(
+      index + 1,
+    ),
   );
 
-
-  int initialIndex=0;
-
+  int initialIndex = 0;
 
   List<String> filteredSurahNames = [];
   TextEditingController searchController = TextEditingController();
   bool isGridView = true;
-
+// final controller=PageController();
   @override
   void initState() {
     super.initState();
-    filteredSurahNames = surahNamesEnglish; 
+    filteredSurahNames = surahNamesEnglish;
   }
 
   void filterSurahs(String query) {
-    final filtered = List.generate(114, (index) => index + 1).where((index) {
-      final surahEnglish = surahNamesEnglish[index - 1].toLowerCase();
-      final surahArabic = surahNamesArabic[index - 1].toLowerCase();
-      final surahRussian = surahNamesRussian[index - 1].toLowerCase();
-      final queryLower = query.toLowerCase();
+    final filtered = List.generate(114, (index) => index + 1)
+        .where((index) {
+          final surahEnglish = surahNamesEnglish[index - 1].toLowerCase();
+          final surahArabic = surahNamesArabic[index - 1].toLowerCase();
+          final surahRussian = surahNamesRussian[index - 1].toLowerCase();
+          final queryLower = query.toLowerCase();
 
-      return surahEnglish.contains(queryLower) ||
-          surahArabic.contains(queryLower) ||
-          surahRussian.contains(queryLower);
-    }).map((index) => surahNamesEnglish[index - 1]).toList(); 
+          return surahEnglish.contains(queryLower) ||
+              surahArabic.contains(queryLower) ||
+              surahRussian.contains(queryLower);
+        })
+        .map((index) => surahNamesEnglish[index - 1])
+        .toList();
 
     setState(() {
       filteredSurahNames = filtered;
@@ -90,7 +85,6 @@ List<Widget> pagesList=[];
           padding: Dis.only(
             lr: 15.w,
             top: 10.h,
-          
           ),
           child: SingleChildScrollView(
             child: Column(
@@ -112,7 +106,7 @@ List<Widget> pagesList=[];
                     children: [
                       SizedBox(
                         height: 40.h,
-                        width: MediaQuery.of(context).size.width*0.5,
+                        width: MediaQuery.of(context).size.width * 0.5,
                         child: TextField(
                           controller: searchController,
                           decoration: InputDecoration(
@@ -131,32 +125,35 @@ List<Widget> pagesList=[];
                           onChanged: filterSurahs,
                         ),
                       ),
-                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children:[
-                      RectangleIcon(
-                        icon: Icon(
-                          IconlyLight.category,
-                          color: isGridView ? AppColors.mainColor : Colors.grey,
-                        ),
-                        onTap: toggleView,
-                        height: 35.h,
-                        width: 35.w,
-                      ),
-                  SizedBox(
-                    width:MediaQuery.of(context).size.width*0.06
-                  ),
-                      RectangleIcon(
-                        icon: Icon(
-                          Icons.menu,
-                          color: !isGridView ? AppColors.mainColor : Colors.grey,
-                        ),
-                        onTap: toggleView,
-                        height: 35.h,
-                        width: 35.w,
-                      ),
-                      ]
-                     )
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            RectangleIcon(
+                              icon: Icon(
+                                IconlyLight.category,
+                                color: isGridView
+                                    ? AppColors.mainColor
+                                    : Colors.grey,
+                              ),
+                              onTap: toggleView,
+                              height: 35.h,
+                              width: 35.w,
+                            ),
+                            SizedBox(
+                                width:
+                                    MediaQuery.of(context).size.width * 0.06),
+                            RectangleIcon(
+                              icon: Icon(
+                                Icons.menu,
+                                color: !isGridView
+                                    ? AppColors.mainColor
+                                    : Colors.grey,
+                              ),
+                              onTap: toggleView,
+                              height: 35.h,
+                              width: 35.w,
+                            ),
+                          ])
                     ],
                   ),
                 ),
@@ -169,29 +166,36 @@ List<Widget> pagesList=[];
                   child: isGridView
                       ? GridView.builder(
                           itemCount: filteredSurahNames.length,
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
                             childAspectRatio: 2.6,
                             crossAxisCount: 2,
                             mainAxisSpacing: 10.0,
                             crossAxisSpacing: 10.0,
                           ),
                           itemBuilder: (context, index) {
+                            int surahNumber = surahNamesEnglish
+                                    .indexOf(filteredSurahNames[index]) +
+                                1;
                             return SurahCard(
                               surahName: filteredSurahNames[index],
-                              surahNumber: surahNamesEnglish.indexOf(filteredSurahNames[index]) + 1,
+                              surahNumber: surahNumber,
                               onTap: () {
+                                int surahIndex=surahNamesEnglish.indexOf(filteredSurahNames[index]);
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) =>PageView.builder(
-                                      itemCount: 114,
-                           itemBuilder: (context,index){
-                            return  SurahsDetailsPage(
-                                      surahNumber: surahNamesEnglish.indexOf(filteredSurahNames[index]) + 1,
-                                    );
-                           },
-                                    )
-                                  ),
+                                      builder: (context) => PageView.builder(
+                                            itemCount: 114,
+                                          controller: PageController(initialPage: surahIndex),
+                                            itemBuilder: (context, i) {
+                                              return SurahsDetailsPage(
+                                                surahNumber:
+                                                 i+1
+                                                 
+                                              );
+                                            },
+                                          )),
                                 );
                               },
                             );
@@ -207,7 +211,9 @@ List<Widget> pagesList=[];
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => SurahsDetailsPage(
-                                      surahNumber: surahNamesEnglish.indexOf(filteredSurahNames[index]) + 1,
+                                      surahNumber: surahNamesEnglish.indexOf(
+                                              filteredSurahNames[index]) +
+                                          1,
                                     ),
                                   ),
                                 );

@@ -16,6 +16,7 @@ import 'package:texnokun/utils/text_styles/text_styles.dart';
 
 import '../../service/audio_service.dart';
 import '../../utils/text_styles/text_font_size.dart';
+import '../widgets/surah_detail_item_screen.dart';
 
 class SurahsDetailsPage extends StatefulWidget {
   final int surahNumber;
@@ -31,6 +32,7 @@ class SurahsDetailsPage extends StatefulWidget {
 
 class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
   bool _isFabVisible = false;
+  bool _isLoadingAudio=false;
 
   late Verse _initialVerse;
   bool _isPlaying = false;
@@ -41,27 +43,21 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
   late FToast fToast;
-  late int currentIndex;
-  late PageController _pageController;
+
   int currentSurahIndex = 0;
   Surah get surah => Quran.getSurah(widget.surahNumber);
-
-  List<ItemScrollController> scrollControllers =
-      List.generate(114, (_) => ItemScrollController(), growable: true);
-
-  List<ItemPositionsListener> positionsListeners =
-      List.generate(114, (_) => ItemPositionsListener.create());
-
-  List<ScrollOffsetController> scrollOffsetControllers =
-      List.generate(114, (_) => ScrollOffsetController());
-
-  List<ScrollOffsetListener> scrollOffsetListeners =
-      List.generate(114, (_) => ScrollOffsetListener.create());
+  final ScrollOffsetController scrollOffsetController =
+      ScrollOffsetController();
+  final ScrollOffsetListener scrollOffsetListener =
+      ScrollOffsetListener.create();
+  final ItemScrollController _scrollController = ItemScrollController();
+  final ItemPositionsListener _positionsListener =
+      ItemPositionsListener.create();
 
   int _initialIndex = 0;
 
   void chooseVerse(int index) {
-    scrollControllers[widget.surahNumber].scrollTo(
+    _scrollController.scrollTo(
         index: index,
         duration: const Duration(
           milliseconds: 150,
@@ -101,11 +97,13 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
           builder: (BuildContext context, StateSetter bottomSheetSetState) {
             player.onPositionChanged.listen(
               (newPosition) {
-                bottomSheetSetState(
+                  if(mounted) {
+                    bottomSheetSetState(
                   () {
                     position = newPosition;
                   },
                 );
+                  }
               },
             );
             return Container(
@@ -118,9 +116,11 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
                     onChanged: (value) async {
                       final newPosition = Duration(seconds: value.toInt());
                       await player.seek(newPosition);
-                      setState(() {
+                      if(mounted) {
+                        setState(() {
                         position = newPosition;
                       });
+                      }
                     },
                     autofocus: true,
                     activeColor: AppColors.mainColor,
@@ -150,7 +150,7 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
                                 final audioPath =
                                     await _audioService.downloadAudio(
                                         widget.surahNumber,
-                                        _initialVerse.verseNumber);
+                                        _initialVerse.verseNumber,);  
                                 await player
                                     .play(DeviceFileSource(audioPath))
                                     .then(
@@ -173,14 +173,14 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
                                 final audioPath =
                                     await _audioService.downloadAudio(
                                         widget.surahNumber,
-                                        _initialVerse.verseNumber);
+                                        _initialVerse.verseNumber,);
                                 await player
                                     .play(DeviceFileSource(audioPath))
                                     .then(
                                       (_) => setState(() => _isPlaying = true),
                                     );
 
-                                scrollControllers[widget.surahNumber].scrollTo(
+                                _scrollController.scrollTo(
                                   index: _initialVerse.verseNumber - 1,
                                   duration: const Duration(milliseconds: 200),
                                   curve: Curves.easeInOutCubic,
@@ -208,12 +208,13 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
                       IconButton(
                         icon: const Icon(Icons.skip_next),
                         onPressed: () async {
-                          _showToasT();
+                          
                           if (_currentRepeat < _repeatCount - 1) {
                             _currentRepeat++;
 
                             final audioPath = await _audioService.downloadAudio(
-                                widget.surahNumber, _initialVerse.verseNumber);
+                              
+                                widget.surahNumber, _initialVerse.verseNumber,);
                             await player.play(DeviceFileSource(audioPath)).then(
                                   (_) => setState(() => _isPlaying = true),
                                 );
@@ -227,12 +228,12 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
                                 surahNumber: surah.number,
                                 verseNumber: oldVerseNumber);
                             final audioPath = await _audioService.downloadAudio(
-                                widget.surahNumber, _initialVerse.verseNumber);
+                                widget.surahNumber, _initialVerse.verseNumber,);
                             await player.play(DeviceFileSource(audioPath)).then(
                                   (_) => setState(() => _isPlaying = true),
                                 );
 
-                            scrollControllers[widget.surahNumber].scrollTo(
+                            _scrollController.scrollTo(
                               index: _initialVerse.verseNumber - 1,
                               duration: const Duration(milliseconds: 200),
                               curve: Curves.easeInOutCubic,
@@ -261,20 +262,34 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
   }
 
   void _onPressedPlayButton(Verse verse) async {
-    setState(() {});
+    
     if (_isPlaying) {
-      await player.stop().then((_) => setState(() => _isPlaying = false));
+      await player.stop().then(
+            (_) => setState(
+              () => _isPlaying = false,
+            ),
+          );
 
       return;
     }
-    _showToasT();
+    setState(() {
+      _isLoadingAudio = true;
+    });
+    if (_isLoadingAudio) {
+      _showToasT();
+    }
+  
+  
     _initialVerse = verse;
     final audioPath = await _audioService.downloadAudio(
-        widget.surahNumber, verse.verseNumber);
+        widget.surahNumber, verse.verseNumber,);
 
     await player
         .play(DeviceFileSource(audioPath))
         .then((_) => setState(() => _isPlaying = true));
+        setState(() {
+      _isLoadingAudio = false;
+        });
 
     _showBottomSheet();
   }
@@ -285,7 +300,7 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
         _currentRepeat++;
 
         final audioPath = await _audioService.downloadAudio(
-            widget.surahNumber, _initialVerse.verseNumber);
+            widget.surahNumber, _initialVerse.verseNumber,);
         await player.play(DeviceFileSource(audioPath)).then(
               (_) => setState(() => _isPlaying = true),
             );
@@ -296,12 +311,12 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
         _initialVerse = Quran.getVerse(
             surahNumber: surah.number, verseNumber: oldVerseNumber);
         final audioPath = await _audioService.downloadAudio(
-            widget.surahNumber, _initialVerse.verseNumber);
+            widget.surahNumber, _initialVerse.verseNumber,);
         await player.play(DeviceFileSource(audioPath)).then(
               (_) => setState(() => _isPlaying = true),
             );
 
-        scrollControllers[widget.surahNumber].scrollTo(
+        _scrollController.scrollTo(
           index: _initialVerse.verseNumber - 1,
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeInOutCubic,
@@ -317,8 +332,7 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
   @override
   void initState() {
     super.initState();
-    currentIndex = widget.surahNumber - 1;
-    _pageController = PageController(initialPage: currentIndex);
+
     fToast = FToast();
     currentSurahIndex = widget.surahNumber;
     fToast.init(context);
@@ -340,9 +354,8 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
         position = newPosition;
       });
     });
-    positionsListeners[widget.surahNumber].itemPositions.addListener(() {
-      final positions =
-          positionsListeners[widget.surahNumber].itemPositions.value;
+    _positionsListener.itemPositions.addListener(() {
+      final positions = _positionsListener.itemPositions.value;
 
       if (positions.isNotEmpty && positions.first.index > 1) {
         if (!_isFabVisible) {
@@ -370,60 +383,87 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
   @override
   void dispose() {
     player.dispose();
-    _pageController.dispose();
-    scrollOffsetControllers[widget.surahNumber];
-    scrollOffsetListeners[widget.surahNumber];
-    positionsListeners[widget.surahNumber];
+
+    scrollOffsetController;
+    scrollOffsetListener;
+    _positionsListener;
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final list = Quran.getSurahVersesAsList(widget.surahNumber);
+    String surahName = Quran.getSurahNameEnglish(widget.surahNumber);
 
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            IconlyLight.arrowLeft2,
+            color: Colors.black,
+          ),
+        ),
+        backgroundColor: AppColors.whiteColor,
+        title: Text(
+          surahName.toString(),
+          style: AppTextStyle.instance.w900.copyWith(
+            color: AppColors.mainColor,
+            fontSize: FontSizeConst.instance.largeFont,
+          ),
+        ),
+      ),
       backgroundColor: AppColors.backColor,
-      body: SurahContentPage(
-        surahNumber: widget.surahNumber,
-        scrollController: scrollControllers[widget.surahNumber],
-        positionsListener: positionsListeners[widget.surahNumber],
-        list: list,
-        initialVerse: _initialVerse,
-        isPlaying: _isPlaying,
-        repeatCount: _repeatCount,
-        onPressedPlayButton: () {
-          _onPressedPlayButton(_initialVerse);
+      body: ScrollablePositionedList.builder(
+        itemCount: list.length,
+        itemScrollController: _scrollController,
+        scrollOffsetController: scrollOffsetController,
+        itemPositionsListener: _positionsListener,
+        scrollOffsetListener: scrollOffsetListener,
+        itemBuilder: (context, index) {
+          final item = list[index];
+
+          return SurahDetailItemScreen(
+            verse: item,
+            initialVerse: _initialVerse,
+            isPlaying: _isPlaying,
+            repeatCount: _repeatCount,
+            surahNumber: widget.surahNumber,
+            onPressedPlayButton: () {
+              _onPressedPlayButton(item);
+            },
+            play10: () {
+              setState(() {
+                _repeatCount = 10;
+                _currentRepeat = 0;
+              });
+              _onPressedPlayButton(item);
+            },
+            play20: () {
+              setState(() {
+                _repeatCount = 20;
+                _currentRepeat = 0;
+              });
+              _onPressedPlayButton(item);
+            },
+            play15: () {
+              setState(() {
+                _repeatCount = 15;
+                _currentRepeat = 0;
+              });
+              _onPressedPlayButton(item);
+            },
+            play5: () {
+              setState(() {
+                _repeatCount = 5;
+                _currentRepeat = 0;
+              });
+              _onPressedPlayButton(item);
+            },
+          );
         },
-        play5: () {
-          setState(() {
-            _repeatCount = 5;
-            _currentRepeat = 0;
-          });
-          _onPressedPlayButton(_initialVerse);
-        },
-        play10: () {
-          setState(() {
-            _repeatCount = 10;
-            _currentRepeat = 0;
-          });
-          _onPressedPlayButton(_initialVerse);
-        },
-        play15: () {
-          setState(() {
-            _repeatCount = 15;
-            _currentRepeat = 0;
-          });
-          _onPressedPlayButton(_initialVerse);
-        },
-        play20: () {
-          setState(() {
-            _repeatCount = 20;
-            _currentRepeat = 0;
-          });
-          _onPressedPlayButton(_initialVerse);
-        },
-        scrollOffsetController: scrollOffsetControllers[widget.surahNumber],
-        scrollOffsetListener: scrollOffsetListeners[widget.surahNumber],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: _isFabVisible
@@ -458,147 +498,6 @@ class _SurahsDetailsPageState extends State<SurahsDetailsPage> {
                   }),
             )
           : null,
-    );
-  }
-}
-
-class SurahContentPage extends StatelessWidget {
-  final int surahNumber;
-  final ItemScrollController scrollController;
-  final ItemPositionsListener positionsListener;
-  final List list;
-  final Verse initialVerse;
-  bool isPlaying;
-  int repeatCount;
-  final void Function() play5;
-  final void Function() onPressedPlayButton;
-  final void Function() play10;
-  final void Function() play15;
-  final void Function() play20;
-  final ScrollOffsetController scrollOffsetController;
-  final ScrollOffsetListener scrollOffsetListener;
-
-  SurahContentPage({
-    super.key,
-    required this.surahNumber,
-    required this.scrollController,
-    required this.positionsListener,
-    required this.list,
-    required this.initialVerse,
-    required this.isPlaying,
-    required this.repeatCount,
-    required this.onPressedPlayButton,
-    required this.play5,
-    required this.play10,
-    required this.play15,
-    required this.play20,
-    required this.scrollOffsetController,
-    required this.scrollOffsetListener,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    String surahName = Quran.getSurahNameEnglish(surahNumber);
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(
-            IconlyLight.arrowLeft2,
-            color: Colors.black,
-          ),
-        ),
-        backgroundColor: AppColors.whiteColor,
-        title: Text(
-          surahName.toString(),
-          style: AppTextStyle.instance.w900.copyWith(
-            color: AppColors.mainColor,
-            fontSize: FontSizeConst.instance.largeFont,
-          ),
-        ),
-      ),
-      body: ScrollablePositionedList.builder(
-          itemCount: list.length,
-          itemScrollController: scrollController,
-          scrollOffsetController: scrollOffsetController,
-          itemPositionsListener: positionsListener,
-          scrollOffsetListener: scrollOffsetListener,
-          itemBuilder: (context, index) {
-            final item = list[index];
-
-            return SurahDetailItemScreen(
-              verse: item,
-              initialVerse: initialVerse,
-              isPlaying: isPlaying,
-              repeatCount: repeatCount,
-              surahNumber: surahNumber,
-              onPressedPlayButton: onPressedPlayButton,
-              play10: play10,
-              play20: play20,
-              play15: play15,
-              play5: play5,
-            );
-          }),
-    );
-  }
-}
-
-class SurahDetailItemScreen extends StatelessWidget {
-  final Verse verse;
-  final int surahNumber;
-  final int repeatCount;
-  final Verse initialVerse;
-  final bool isPlaying;
-  final void Function() onPressedPlayButton;
-  final void Function() play5;
-  final void Function() play10;
-  final void Function() play15;
-  final void Function() play20;
-
-  const SurahDetailItemScreen(
-      {super.key,
-      required this.verse,
-      required this.surahNumber,
-      required this.initialVerse,
-      required this.isPlaying,
-      required this.onPressedPlayButton,
-      required this.repeatCount,
-      required this.play10,
-      required this.play5,
-      required this.play20,
-      required this.play15});
-
-  @override
-  Widget build(BuildContext context) {
-    final itemEnglishVerse = Quran.getVerse(
-        surahNumber: verse.surahNumber,
-        verseNumber: verse.verseNumber,
-        language: QuranLanguage.english);
-    final itemRussianVerse = Quran.getVerse(
-        surahNumber: verse.surahNumber,
-        verseNumber: verse.verseNumber,
-        language: QuranLanguage.russian);
-    final itemArabicVerse = Quran.getVerse(
-      surahNumber: verse.surahNumber,
-      verseNumber: verse.verseNumber,
-    );
-
-    return SurahDetail(
-      arabicAyahs: itemArabicVerse.text,
-      englishAyahs: itemEnglishVerse.text,
-      russianAyahs: itemRussianVerse.text,
-      verseCount: verse.verseNumber,
-      surahCount: surahNumber,
-      isPlaying: ((verse == initialVerse) && isPlaying),
-      repeatCount: (verse == initialVerse) ? repeatCount : 0,
-      togglePlayPause: () => onPressedPlayButton(),
-      play10: play10,
-      play15: play15,
-      play20: play20,
-      play5: play5,
-      verse: verse,
     );
   }
 }

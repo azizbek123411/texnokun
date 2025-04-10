@@ -28,7 +28,7 @@ class AudioServices {
 
   
 
-  Future<String> downloadAudio(surahId, verceId) async {
+  Future<String> downloadAudio(surahId, verceId,) async {
     final path = await getDownloadedFilePath(surahId, verceId);
 
     if (path.isNotEmpty) {
