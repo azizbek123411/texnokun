@@ -50,6 +50,8 @@ dependencies:
   google_fonts: ^6.2.1
   persistent_bottom_nav_bar: ^6.2.1
   assets_audio_player: ^3.1.1
+  just_audio: ^0.9.46
+  just_audio_background: ^0.0.1-beta.15
   
   
 
