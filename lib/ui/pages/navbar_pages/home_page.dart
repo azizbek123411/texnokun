@@ -9,7 +9,7 @@ import 'package:texnokun/utils/sizes/screen_utils.dart';
 import 'package:texnokun/utils/text_styles/text_font_size.dart';
 import 'package:texnokun/utils/text_styles/text_styles.dart';
 
-import '../surahs_details_page.dart';
+import '../screens/surahs_details_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

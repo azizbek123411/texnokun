@@ -12,6 +12,7 @@ import 'package:texnokun/utils/app_styles/app_colors.dart';
 
 
 Future<void> main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
   await Quran.initialize();
   await Hive.initFlutter();

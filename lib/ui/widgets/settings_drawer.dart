@@ -8,6 +8,7 @@ import 'package:texnokun/utils/text_styles/text_font_size.dart';
 import 'package:texnokun/utils/text_styles/text_styles.dart';
 
 import '../../provider/font_size_provider.dart';
+import '../pages/quran_book_page.dart';
 
 class SettingsDrawer extends StatefulWidget {
   SettingsDrawer({super.key});
@@ -135,7 +136,7 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
             ),
           ),
           CheckboxListTile(
-            activeColor: AppColors.mainColor,
+              activeColor: AppColors.mainColor,
               title: Text(
                 'Amiri font',
                 style: GoogleFonts.amiri(),
@@ -147,7 +148,7 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                 }
               }),
           CheckboxListTile(
-            activeColor: AppColors.mainColor,
+              activeColor: AppColors.mainColor,
               title: Text(
                 'Scheherazade font',
                 style: GoogleFonts.scheherazadeNew(),
@@ -159,8 +160,8 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                 }
               }),
           CheckboxListTile(
-            activeColor: AppColors.mainColor,
-             title: Text(
+              activeColor: AppColors.mainColor,
+              title: Text(
                 'Lateef font',
                 style: GoogleFonts.lateef(),
               ),
@@ -171,8 +172,8 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                 }
               }),
           CheckboxListTile(
-            activeColor: AppColors.mainColor,
-             title: Text(
+              activeColor: AppColors.mainColor,
+              title: Text(
                 'Qahiri font',
                 style: GoogleFonts.qahiri(),
               ),
@@ -181,7 +182,19 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                 if (selected == true) {
                   changeFont.changeFont('Qahiri');
                 }
-              })
+              }),
+          ListTile(
+            title: Text('Full Quran',  style: AppTextStyle.instance.w600.copyWith(
+              fontSize: FontSizeConst.instance.mediumFont,
+            ),),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const QuranBookPage(),
+              ),
+            ),
+            trailing: const Icon(Icons.arrow_forward_ios_rounded),
+          )
         ],
       ),
     );
